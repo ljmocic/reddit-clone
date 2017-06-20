@@ -12,6 +12,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import beans.Comment;
+import beans.Message;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
@@ -39,7 +41,7 @@ public class TopicService {
 		
 		if(user != null) {
 
-			Topic topic = new Topic(name, content, user, dao.searchSubforums("test1"));
+			Topic topic = new Topic(name, content, user, "test1");
 			
 			String subforumId = "test1";
 			dao.addTopic(subforumId, topic);
@@ -173,6 +175,101 @@ public class TopicService {
 		}
 		else {
 			return "Must be logged to dislike topic!";
+		}
+	}
+	
+	@GET
+	@Path("/saveTopic/{subforumId}/{topicId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String saveTopic(	@PathParam("subforumId") String subforumId,
+								@PathParam("topicId") String topicId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Topic topic = dao.searchTopics(subforumId, topicId);
+			
+			if(topic != null) {
+				if(!user.getSavedTopics().contains(topic)) {
+					user.saveTopic(topic);
+					return "Successfully saved!";
+				}
+				else {
+					return "Already saved!";
+				}
+			}
+			else {
+				return "Failed to save";
+			}
+		}
+		else {
+			return "Must be logged to save topic!";
+		}
+	}
+	
+	@GET
+	@Path("/saveComment/{subforumId}/{topicId}/{commendId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String saveComment(	@PathParam("subforumId") String subforumId,
+						@PathParam("topicId") String topicId,
+						@PathParam("commentId") String commentId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Comment comment = dao.searchComments(subforumId, topicId, commentId);
+			
+			if(comment != null) {
+				if(!user.getSavedComments().contains(comment)) {
+					user.saveComment(comment);
+					return "Successfully saved!";
+				}
+				else {
+					return "Already saved!";
+				}
+			}
+			else {
+				return "Failed to save";
+			}
+		}
+		else {
+			return "Must be logged to save topic!";
+		}
+	}
+	
+	@POST
+	@Path("/report/{subforumId}/{topicId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String report(	@PathParam("subforumId") String subforumId,
+								@PathParam("topicId") String topicId,
+								@FormParam("complaintText") String complaintText) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Subforum subforum = dao.searchSubforums(subforumId);
+			Topic topic = dao.searchTopics(subforumId, topicId);
+			
+			if(topic != null && subforum != null) {
+				// TODO real implementation
+				User moderator = subforum.getResponsibleModerator();
+				moderator.addMessage(new Message(	user.getName(), 
+													subforum.getResponsibleModerator().getName(), 
+													complaintText));
+				return "Reported" + topic.getName();
+			}
+			else {
+				return "Failed to report";
+			}
+		}
+		else {
+			return "Must be logged to report topic!";
 		}
 	}
 	

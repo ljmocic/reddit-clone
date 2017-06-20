@@ -26,9 +26,12 @@ public class Application implements Serializable {
 		users.add(admin);
 		users.add(temp);
 		
-		subforums.add(new Subforum("test1", "test", "test", "test", null));
+		Subforum subforum1 = new Subforum("test1", "test", "test", "test", null);
+		subforums.add(subforum1);
 		subforums.add(new Subforum("test2", "test", "test", "test", null));
 		subforums.add(new Subforum("test3", "test", "test", "test", null));
+		
+		admin.followForum(subforum1);
 	}
 
 	public List<Subforum> getSubforums() {

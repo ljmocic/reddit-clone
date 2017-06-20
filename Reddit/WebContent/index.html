@@ -6,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<!--<link rel="icon" href="../../favicon.ico">-->
+	<!--<link rel="icon" href="/img/favicon.ico">-->
 
 	<title>Index</title>
 
@@ -57,9 +57,8 @@
                             ljmocic
                             <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="">Profile</a></li>
+							<li><a href="" data-toggle="modal" data-target="#profilePage">Profile</a></li>
 							<li><a href="" data-toggle="modal" data-target="#showInbox">Inbox&nbsp;<span class="badge">0</span></a></li>
-							<li><a href="" data-toggle="modal" data-target="#sendMessage">Send&nbsp;message</a></li>
 							<li class="divider"></li>
 							<li><a href="">Logout</a>
 							</li>
@@ -70,7 +69,6 @@
 					<li><a href="" data-toggle="modal" data-target="#registerUser">Register</a></li>
 				</ul>
 			</div>
-			<!--/.nav-collapse -->
 		</div>
 	</nav>
 
@@ -80,6 +78,8 @@
 
 			<!-- Themes column -->
 			<div class="col-md-8">
+
+				<h3 id="subforumName"></h3>
 
 				<table id="topics">
 					<tbody>
@@ -128,55 +128,29 @@
 
 				<!-- Subforums -->
 				<div class="well">
-					<h4>TODO Subforums</h4>
-					<div class="row">
-						<div class="col-lg-6">
-							<ul class="list-unstyled">
-								<li><a href="#">Category Name</a>
-								</li>
-								<li><a href="#">Category Name</a>
-								</li>
-								<li><a href="#">Category Name</a>
-								</li>
-								<li><a href="#">Category Name</a>
-								</li>
-							</ul>
-						</div>
-						<!-- /.col-lg-6 -->
-						<div class="col-lg-6">
-							<ul class="list-unstyled">
-								<li><a href="#">Category Name</a>
-								</li>
-								<li><a href="#">Category Name</a>
-								</li>
-								<li><a href="#">Category Name</a>
-								</li>
-								<li><a href="#">Category Name</a>
-								</li>
-							</ul>
-						</div>
-						<!-- /.col-lg-6 -->
+					<h4>Subforums</h4>
+					<div id="subforumsSidebarList" class="row">
+						
 					</div>
-					<!-- /.row -->
 				</div>
 
 				<!-- User actions -->
 				<div class="well">
-					<h4>User action</h4>
+					<h4>User actions</h4>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addTopic">Add topic</button>
-
+					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#sendMessage">Send message</button>
 				</div>
 
 				<!-- Admin/Moderator actions -->
 				<div class="well">
 					<h4>Moderator panel</h4>
-					<p>TODO add admin/moderator actions</p>
+					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#usersManagement">Users management</button>
+					
 				</div>
 
 			</div>
 
 		</div>
-		<!-- /.row -->
 
 		<hr>
 
@@ -486,6 +460,58 @@
 
 		</div>
 	</div>
+
+	<!--Profile-->
+	<div id="profilePage" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Profile</h4>
+				</div>
+				<div class="modal-body" id="profile">
+					<div id="profileSavedTopic">
+						<h4>Saved topics: </h4>
+					</div>
+					<div id="profileSavedComments">
+						<h4>Saved comments: </h4>
+					</div>
+					<div id="profileLikes">
+						<h4>Likes: </h4>
+					</div>
+					<div id="profileDislikes">
+						<h4>Dislikes: </h4>
+					</div>
+					<div id="profileFollowedSubforums">
+						<h4>Followed subforums: </h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Users management-->
+	<div id="usersManagement" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Users</h4>
+				</div>
+				<div class="modal-body" id="profile">
+					<table id="users" border="1">
+						<tr>
+							<td>Username</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 
 </body>
 

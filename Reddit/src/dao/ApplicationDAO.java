@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import beans.Application;
+import beans.Comment;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
@@ -135,6 +136,17 @@ public class ApplicationDAO {
 		}
 		return null;
 	}
+	
+	public Comment searchComments(String subforumId, String topicId, String commentId) {
+		Topic topic = searchTopics(subforumId, topicId);
+		
+		for(Comment comment: topic.getComments()) {
+			if(comment.getText().equals(commentId)) {
+				return comment;
+			}
+		}
+		return null;
+	}
 
 	public void addSubforum(Subforum subforum) {
 		application.getSubforums().add(subforum);
@@ -171,5 +183,7 @@ public class ApplicationDAO {
 			}
 		}
 	}
+
+	
 	
 }

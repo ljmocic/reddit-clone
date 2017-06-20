@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @SuppressWarnings("serial")
 public class Subforum implements Serializable {
 
@@ -15,7 +13,6 @@ public class Subforum implements Serializable {
 	private User responsibleModerator;
 	private String rules;
 	
-	@JsonIgnore
 	private List<Topic> topics;
 	
 	private List<User> moderators;
@@ -36,9 +33,9 @@ public class Subforum implements Serializable {
 	private void initData() {
 		User user = new User("username", "password", "email", "name", "surname", "phoneNumber");
 		
-		topics.add(new Topic("topic1", "content1", user, this));
-		topics.add(new Topic("topic2", "content2", user, this));
-		topics.add(new Topic("topic3", "content3", user, this));
+		topics.add(new Topic("topic1", "content1", user, name));
+		topics.add(new Topic("topic2", "content2", user, name));
+		topics.add(new Topic("topic3", "content3", user, name));
 	}
 
 	public String getName() {

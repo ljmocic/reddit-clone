@@ -118,7 +118,22 @@ public class UserService {
 		else {
 			return "Must be logged in to update subforum!";
 		}
+	}
+	
+	@GET
+	@Path("/active")
+	@Produces(MediaType.APPLICATION_JSON)
+	public User active() {
 		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			return user;
+		}
+		else {
+			return null;
+		}
 	}
 	
 }

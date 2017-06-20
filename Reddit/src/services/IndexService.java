@@ -67,10 +67,15 @@ public class IndexService {
 			
 			User receiver = dao.searchUser(receiverId);
 			
-			Message message = new Message(user.getUsername(), receiver.getUsername(), content);
-			receiver.addMessage(message);
+			if(receiver != null) {
+				Message message = new Message(user.getUsername(), receiver.getUsername(), content);
+				receiver.addMessage(message);
+				
+				return "Message sent!";
+			}
+
+			return "Receiver doesn't exist!";
 			
-			return "Message sent!";
 		}
 		else {
 			return "Must be logged in to send message!";

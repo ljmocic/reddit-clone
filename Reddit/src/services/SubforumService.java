@@ -9,10 +9,12 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import beans.Message;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
@@ -106,6 +108,60 @@ public class SubforumService {
 		}
 		else {
 			return "Must be logged in to add subforum!";
+		}
+	}
+	
+	@POST
+	@Path("/follow/{subforumId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String follow(@PathParam("subforumId") String subforumId){
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		Subforum subforum = dao.searchSubforums(subforumId);
+		
+		if(user != null) {
+			if(subforum != null) {
+				user.followForum(subforum);
+				return "Followed subforum " + subforum.getName();
+			}
+			else {
+				return "Error while trying to follow subforum";
+			}
+		}
+		else {
+			return "Must be logged in to follow subforum!";
+		}
+	}
+	
+	@POST
+	@Path("/report/{subforumId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String report(	@PathParam("subforumId") String subforumId, 
+						@FormParam("complaintText") String complaintText) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		Subforum subforum = dao.searchSubforums(subforumId);
+		
+		if(user != null) {
+			if(subforum != null) {
+				// TODO real implementation
+				User moderator = subforum.getResponsibleModerator();
+				moderator.addMessage(new Message(	user.getName(), 
+													subforum.getResponsibleModerator().getName(), 
+													complaintText));
+				
+				return "Reported subforum " + subforum.getName();
+			}
+			else {
+				return "Error while trying to report subforum";
+			}
+		}
+		else {
+			return "Must be logged in to report subforum!";
 		}
 	}
 	

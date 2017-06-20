@@ -15,17 +15,18 @@ public class Topic implements Serializable {
 	private int likes;
 	private int dislikes;
 
-	private Subforum parentSubforum;
+	private String parentSubforumName;
+	
 	private List<Comment> comments;
 
-	public Topic(String name, String content, User author, Subforum parentSubforum) {
+	public Topic(String name, String content, User author, String parentSubforumName) {
 		super();
 		this.name = name;
 		this.author = author;
 		this.creationDate = (new Date()).toString();
 		this.likes = 0;
 		this.dislikes = 0;
-		this.parentSubforum = parentSubforum;
+		this.parentSubforumName = parentSubforumName;
 		this.comments = new ArrayList<Comment>();
 		this.content = content;
 	}
@@ -70,12 +71,12 @@ public class Topic implements Serializable {
 		this.dislikes = dislikes;
 	}
 
-	public Subforum getParentSubforum() {
-		return parentSubforum;
+	public String getParentSubforumName() {
+		return parentSubforumName;
 	}
 
-	public void setParentSubforum(Subforum parentSubforum) {
-		this.parentSubforum = parentSubforum;
+	public void setParentSubforum(String parentSubforumName) {
+		this.parentSubforumName = parentSubforumName;
 	}
 
 	public List<Comment> getComments() {

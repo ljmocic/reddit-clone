@@ -22,7 +22,8 @@ public class User implements Serializable {
 	private Role role;
 
 	private List<Subforum> followedSubforums;
-	private List<Topic> followedTopics;
+	private List<Topic> savedTopics;
+	private List<Comment> savedComments;
 	private List<Topic> likedTopics;
 	private List<Topic> dislikedTopics;
 	private List<Comment> comments;
@@ -39,7 +40,8 @@ public class User implements Serializable {
 		this.registrationDate = (new Date()).toString();
 		this.role = Config.Role.USER;
 		this.followedSubforums = new ArrayList<Subforum>();
-		this.followedTopics = new ArrayList<Topic>();
+		this.savedTopics = new ArrayList<Topic>();
+		this.savedComments = new ArrayList<Comment>();
 		this.likedTopics = new ArrayList<Topic>();
 		this.dislikedTopics = new ArrayList<Topic>();
 		this.comments = new ArrayList<Comment>();
@@ -118,14 +120,22 @@ public class User implements Serializable {
 		this.followedSubforums = followedSubforums;
 	}
 
-	public List<Topic> getFollowedTopics() {
-		return followedTopics;
+	public List<Topic> getSavedTopics() {
+		return savedTopics;
 	}
 
-	public void setFollowedTopics(List<Topic> followedTopics) {
-		this.followedTopics = followedTopics;
+	public void setSavedTopics(List<Topic> savedTopics) {
+		this.savedTopics = savedTopics;
 	}
-	
+
+	public List<Comment> getSavedComments() {
+		return savedComments;
+	}
+
+	public void setSavedComments(List<Comment> savedComments) {
+		this.savedComments = savedComments;
+	}
+
 	public List<Topic> getLikedTopics() {
 		return likedTopics;
 	}
@@ -162,7 +172,7 @@ public class User implements Serializable {
 	public String toString() {
 		return "User [username=" + username + ", password=" + password + ", email=" + email + ", name=" + name
 				+ ", surname=" + surname + ", phoneNumber=" + phoneNumber + ", registrationDate=" + registrationDate
-				+ ", followedSubforums=" + followedSubforums + ", followedTopics=" + followedTopics + ", comments="
+				+ ", followedSubforums=" + followedSubforums + ", followedTopics=" + savedTopics + ", comments="
 				+ comments + "]";
 	}
 
@@ -176,6 +186,18 @@ public class User implements Serializable {
 	
 	public void dislike(Topic topic) {
 		dislikedTopics.add(topic);
+	}
+
+	public void saveTopic(Topic topic) {
+		savedTopics.add(topic);
+	}
+	
+	public void saveComment(Comment comment) {
+		savedComments.add(comment);
+	}
+
+	public void followForum(Subforum subforum) {
+		followedSubforums.add(subforum);
 	}
 	
 }
