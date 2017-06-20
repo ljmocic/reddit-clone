@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Add subforum</title>
+
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <form action="/Reddit/rest/subforum/create" method="POST" role="form">
+            <h2>Add subforum</h2>
+
+            <div class="form-group">
+                <label for="name">name</label>
+                <input type="text" id="name" class="form-control" name="name" placeholder="Input field">
+                <label for="description">description</label>
+                <input type="text" id="description" class="form-control" name="description" placeholder="Input field">
+                <label for="rules">rules</label>
+                <input type="text" id="rules" class="form-control" name="rules" placeholder="Input field">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add subforum</button>
+        </form>
+    </body>
+</html>
+
