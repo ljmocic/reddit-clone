@@ -1,16 +1,10 @@
 var baseUrl = 'http://localhost:8080/reddit-clone/rest';
 
-
 $(document).ready(function () {
 
     $('#navbarLoggedIn').hide();
     $('#adminActionsPanel').hide();
     $('#userActionsPanel').hide();
-
-    var form = $('#loginForm');
-    form.submit(function (e) {
-        handleLogin(e);
-    });
 
     checkLoggedInStatus();
 
@@ -22,50 +16,108 @@ $(document).ready(function () {
 
     loadProfileDetails();
 
-    $('#addTopicSubmitButton').click(function () {
-        addTopic();
+    loadMessages();
+
+    // forms setup
+    var loginFormId = 'loginForm';
+    $('#' + loginFormId).submit(function(e) {
+        handleForm(e, loginFormId);
+    });
+
+    var registerFormId = 'registerForm';
+    $('#' + registerFormId).submit(function(e) {
+        handleForm(e, registerFormId);
+    });
+
+    var messageFormId = 'messageForm';
+    $('#' + messageFormId).submit(function(e) {
+        handleForm(e, messageFormId);
+    });
+
+    var addSubforumFormId = 'addSubforumForm';
+    $('#' + addSubforumFormId).submit(function(e) {
+        handleForm(e, addSubforumFormId);
+    });
+
+    var editSubforumFormId = 'editSubforumForm';
+    $('#' + editSubforumFormId).submit(function(e) {
+        handleForm(e, editSubforumFormId);
+    });
+
+    $('#addTopicForm').submit(function(e) {
+        addTopic(e);
+    });
+
+    // buttons setup
+    $('#editSubforumButton').click(function() {
+        editSubforum();
+    });
+
+    $('#deleteSubforumButton').click(function() {
+        deleteSubforum();
+    });
+
+    $('#logout').click(function() {
+        logoutUser();
     });
 
 });
 
-function handleLogin(e) {
-    var form = $('#loginForm');
-    e.preventDefault();
+function editSubforum() {
+    var activeSubforumId = $('#subforumNameH3').text();
+    $('#EditSubforumFormName').val(activeSubforumId);
+    $('#editSubforum').modal('show');
+}
 
+function deleteSubforum() {
+    var activeSubforumId = $('#subforumNameH3').text();
+    $.ajax({
+        url: baseUrl + "/subforum/delete/" + activeSubforumId
+    }).then(function (message) {
+        alert(message);
+        refresh();
+    });
+}
+
+function logoutUser() {
+
+    $.ajax({
+        url: baseUrl + "/user/logout"
+    }).then(function(message) {
+        alert(message);
+        refresh();
+    });
+
+}
+
+function handleForm(e, formId) {
+    var form = $('#' + formId);
+    e.preventDefault();
     $.ajax({
         type: form.attr('method'),
         url: form.attr('action'),
         data: form.serialize(),
-        success: function (data) {
+        success: function(data) {
             alert(data);
             $('.modal').modal('hide');
             refresh();
         },
-        error: function (data) {
+        error: function(data) {
             alert('An error occurred.');
         },
     });
 
 }
 
-function addNewSubforum(e) {
-    var form = $('#loginForm');
-    e.preventDefault();
-
+function loadMessages() {
     $.ajax({
-        type: form.attr('method'),
-        url: form.attr('action'),
-        data: form.serialize(),
-        success: function (data) {
-            alert(data);
-            $('.modal').modal('hide');
-        },
-        error: function (data) {
-            alert('An error occurred.');
-        },
+        url: "http://localhost:8080/reddit-clone/rest/index/messages"
+    }).then(function(messages) {
+        messages.forEach(function(message) {
+            var messageRow = '<p>' + message.senderId + " " + message.content + '</p>';
+            $('#messages').append(messageRow);
+        });
     });
-
-    refresh();
 }
 
 function checkLoggedInStatus() {
@@ -84,6 +136,7 @@ function checkLoggedInStatus() {
             $('#userActionsPanel').show();
         }
         else if(user.role == "admin" || user.role == "moderator") {
+            // append delete update forum action
             $('#navbarLoggedIn').show();
             $('#userActionsPanel').show();
             $('#adminActionsPanel').show();
@@ -122,13 +175,12 @@ function loadSubforumLinks() {
                 '<p><a href="/Reddit/subforum.html">' + subforum.name + " " + subforum.description + '</a></p>'
             );
 
-            $('#subforumsSidebarList').append('<p><a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a></p>');
+            $('#subforumsSidebarList').append('<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a>&nbsp;');
         });
 
         $(".subforumLink").click(function () {
-            var clickedBtnID = $(this).attr('id');
-            //alert(clickedBtnID);
-            loadSubforum(clickedBtnID);
+            var clickedButtonId = $(this).attr('id');
+            loadSubforum(clickedButtonId);
         });
 
     });
@@ -226,6 +278,8 @@ function loadSubforum(subforumId) {
                 }).then(function (topic) {
 
                     $('#topicNameModal').empty();
+                    $('#topicContentModal').empty();
+
                     $('#topicNameModal').append('<h4 class="modal-title">' + topic.name + '</h4>');
                     //alert(topic.type);
 
@@ -233,7 +287,7 @@ function loadSubforum(subforumId) {
                         $('#topicContentModal').append('<div>' + topic.content + '</div>');
                     }
                     else if (topic.type == "link") {
-                        $('#topicContentModal').append('<div><a href="' + topic.content + '">' + topic.content + '</a></div>');
+                        $('#topicContentModal').append('<div><a href="' + topic.content + '">' + topic.name + '</a></div>');
                     }
                     else if (topic.type == "image") {
                         $('#topicContentModal').append('<div><img src="' + topic.content + ' alt="Nema prikaza"></div>');
@@ -250,20 +304,26 @@ function loadSubforum(subforumId) {
 
 }
 
-function addTopic() {
-
-    var name = $('#AddTopicInputName').val();
-    var type = $('#AddTopicInputType').val();
-    var content = $('#AddTopicInputContent').val();
+function addTopic(e) {
+    e.preventDefault();
 
     var activeSubforumId = $('#subforumNameH3').text();
+    var form = $('#addTopicForm');
 
+    alert(form.serialize());
+    
     $.ajax({
-        url: baseUrl + "/topic/create/" + activeSubforumId + "/" + name + "/" + type + "/" + content
-    }).then(function (response) {
-        //alert(response);
-        $('#addTopic').modal('hide');
-        loadSubforum(activeSubforumId);
+        type: form.attr('method'),
+        url: baseUrl + '/topic/create/' + activeSubforumId,
+        data: form.serialize(),
+        success: function(data) {
+            alert(data);
+            $('.modal').modal('hide');
+            loadSubforum(activeSubforumId);
+        },
+        error: function(data) {
+            alert('An error occurred.');
+        },
     });
 
 }
