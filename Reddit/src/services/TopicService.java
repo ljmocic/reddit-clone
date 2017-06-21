@@ -30,13 +30,13 @@ public class TopicService {
 
 	ApplicationDAO dao = ApplicationDAO.getInstance();
 	
-	@GET
-	@Path("/create/{subforumId}/{topicId}/{type}/{content}")
+	@POST
+	@Path("/create/{subforumId}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String create(	@PathParam("subforumId") String subforumId,
-							@PathParam("topicId") String topicId,
-							@PathParam("type") String type,
-							@PathParam("content") String content) {
+							@FormParam("topicId") String topicId,
+							@FormParam("type") String type,
+							@FormParam("content") String content) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");

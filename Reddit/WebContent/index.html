@@ -16,9 +16,6 @@
 	<script src="js/jquery-3.2.1.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/indexController.js"></script>
-	<script src="js/inboxController.js"></script>
-	<script src="js/registerController.js"></script>
-	<script src="js/messageController.js"></script>
 
 	<style>
 		body {
@@ -58,7 +55,7 @@
 							<li><a href="" data-toggle="modal" data-target="#profilePage">Profile</a></li>
 							<li><a href="" data-toggle="modal" data-target="#showInbox">Inbox&nbsp;<span class="badge">0</span></a></li>
 							<li class="divider"></li>
-							<li><a href="">Logout</a>
+							<li><a id="logout" href="#">Logout</a>
 							</li>
 
 						</ul>
@@ -131,6 +128,8 @@
 					<h4>Moderator panel</h4>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#usersManagement">Users management</button>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addSubforum">Add subforum</button>
+					<button type="button" class="btn btn-info btn-md" id="editSubforumButton">Edit subforum</button>
+					<button type="button" class="btn btn-info btn-md" id="deleteSubforumButton">Delete subforum</button>
 				</div>
 			</div>
 		</div>
@@ -248,11 +247,11 @@
 					<h4 class="modal-title">Add topic</h4>
 				</div>
 				<div class="modal-body">
-					<div class="form-horizontal">
+					<form id="addTopicForm" class="form-horizontal" action="" method="POST" role="form">
 						<div class="form-group">
 							<label for="name" class="col-sm-2 control-label">Name</label>
 							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
+								<input name="topicId" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
 							</div>
 						</div>
 						<div class="form-group">
@@ -276,7 +275,7 @@
 								<button id="addTopicSubmitButton" class="btn btn-primary text-right">Add topic</button>
 							</div>
 						</div>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -305,7 +304,7 @@
 					<h4 class="modal-title">Add subforum</h4>
 				</div>
 				<div class="modal-body">
-					<form class="form-horizontal" action="/reddit-clone/rest/subforum/create" method="POST" role="form">
+					<form id="addSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/create" method="POST" role="form">
 						<div class="form-group">
 							<label for="name" class="col-sm-2 control-label">Name</label>
 							<div class="col-sm-10">
@@ -334,19 +333,19 @@
 			</div>
 		</div>
 	</div>
-	<div id="updateSubforum" class="modal fade" role="dialog">
+	<div id="editSubforum" class="modal fade" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Add subforum</h4>
+					<h4 class="modal-title">Edit subforum</h4>
 				</div>
 				<div class="modal-body">
-					<form class="form-horizontal" action="/reddit-clone/rest/subforum/create" method="POST" role="form">
+					<form id="editSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/update" method="POST" role="form">
 						<div class="form-group">
 							<label for="name" class="col-sm-2 control-label">Name</label>
 							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="name" placeholder="Enter subforum name">
+								<input name="name" type="text" class="form-control" id="EditSubforumFormName" placeholder="Enter subforum name" readonly>
 							</div>
 						</div>
 						<div class="form-group">
@@ -363,44 +362,7 @@
 						</div>
 						<div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Add subforum</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="deleteSubforum" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Add subforum</h4>
-				</div>
-				<div class="modal-body">
-					<form class="form-horizontal" action="/reddit-clone/rest/subforum/create" method="POST" role="form">
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="name" placeholder="Enter subforum name">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="description" class="col-sm-2 control-label">Description</label>
-							<div class="col-sm-10">
-								<input name="description" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="rules" class="col-sm-2 control-label">Rules</label>
-							<div class="col-sm-10">
-								<textarea name="rules" id="rules" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Add subforum</button>
+								<button type="submit" class="btn btn-primary text-right">Edit subforum</button>
 							</div>
 						</div>
 					</form>
@@ -518,7 +480,6 @@
 			</div>
 		</div>
 	</div>
-
 
 </body>
 

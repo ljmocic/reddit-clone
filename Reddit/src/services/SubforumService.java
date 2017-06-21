@@ -19,6 +19,7 @@ import beans.Subforum;
 import beans.Topic;
 import beans.User;
 import dao.ApplicationDAO;
+import utils.Config;
 
 @Path("/subforum")
 public class SubforumService {
@@ -42,10 +43,20 @@ public class SubforumService {
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-
-			Subforum subforum = new Subforum(name, description, rules, null, null);
-			dao.addSubforum(subforum);
-			return "Added a forum" + subforum.toString();
+			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
+				if(dao.searchSubforums(name) == null) {
+					Subforum subforum = new Subforum(name, description, rules, null, null);
+					dao.addSubforum(subforum);
+					return "Added a forum" + subforum.toString();
+				}
+				else {
+					return "Subforum already exists!";
+				}
+			}
+			else {
+				return "You do not have permission to create subforum!";
+			}
+			
 		}
 		else {
 			return "Must be logged in to add subforum!";
@@ -68,6 +79,21 @@ public class SubforumService {
 		
 		if(subforum != null) {
 			return subforum.getTopics();
+		}
+		else {
+			return null;
+		}
+	}
+	
+	@GET
+	@Path("/{subforumId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Subforum subforum(@PathParam("subforumId") String subforumId) {
+		
+		Subforum subforum = dao.searchSubforums(subforumId);
+		
+		if(subforum != null) {
+			return subforum;
 		}
 		else {
 			return null;
@@ -120,21 +146,21 @@ public class SubforumService {
 		
 	}
 	
-	@POST
-	@Path("/delete")
+	@GET
+	@Path("/delete/{subforumId}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String delete(@FormParam("name") String name){
+	public String delete(@PathParam("subforumId") String subforumId){
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-			if(dao.searchSubforums(name) != null) {
-				dao.deleteSubforum(name);
-				return "Forum deleted " + name;
+			if(dao.searchSubforums(subforumId) != null) {
+				dao.deleteSubforum(subforumId);
+				return "Forum deleted " + subforumId;
 			}
 			else {
-				return "Error deleting " + name;
+				return "Error deleting " + subforumId;
 			}
 		}
 		else {
@@ -158,11 +184,11 @@ public class SubforumService {
 				return "Followed subforum " + subforum.getName();
 			}
 			else {
-				return "Error while trying to follow subforum";
+				return "Error while trying to follow a subforum";
 			}
 		}
 		else {
-			return "Must be logged in to follow subforum!";
+			return "Must be logged in to follow a subforum!";
 		}
 	}
 	
@@ -170,7 +196,7 @@ public class SubforumService {
 	@Path("/report/{subforumId}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String report(	@PathParam("subforumId") String subforumId, 
-						@FormParam("complaintText") String complaintText) {
+							@FormParam("complaintText") String complaintText) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");

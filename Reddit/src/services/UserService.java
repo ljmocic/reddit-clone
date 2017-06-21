@@ -136,4 +136,21 @@ public class UserService {
 		}
 	}
 	
+	@GET
+	@Path("/logout")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String logout() {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			session.invalidate();
+			return "Logged out!";
+		}
+		else {
+			return "Already logged out!";
+		}
+	}
+	
 }
