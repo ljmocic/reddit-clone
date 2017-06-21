@@ -11,6 +11,7 @@ public class Topic implements Serializable {
 	private String name;
 	private User author;
 	private String content;
+	private String type;
 	private String creationDate;
 	private int likes;
 	private int dislikes;
@@ -45,6 +46,18 @@ public class Topic implements Serializable {
 
 	public void setAuthor(User author) {
 		this.author = author;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setParentSubforumName(String parentSubforumName) {
+		this.parentSubforumName = parentSubforumName;
 	}
 
 	public String getCreationDate() {

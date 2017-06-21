@@ -30,20 +30,22 @@ public class TopicService {
 
 	ApplicationDAO dao = ApplicationDAO.getInstance();
 	
-	@POST
-	@Path("/create")
+	@GET
+	@Path("/create/{subforumId}/{topicId}/{type}/{content}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String create(	@FormParam("name") String name,
-							@FormParam("content") String content) {
+	public String create(	@PathParam("subforumId") String subforumId,
+							@PathParam("topicId") String topicId,
+							@PathParam("type") String type,
+							@PathParam("content") String content) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 
-			Topic topic = new Topic(name, content, user, "test1");
+			Topic topic = new Topic(topicId, content, user, subforumId);
+			//topic.setType(type);
 			
-			String subforumId = "test1";
 			dao.addTopic(subforumId, topic);
 			
 			return "Added a topic" + topic.toString();

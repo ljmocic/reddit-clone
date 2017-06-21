@@ -166,7 +166,7 @@ public class ApplicationDAO {
 	public void addTopic(String subforumId, Topic topic) {
 		// TODO update with real id later
 		//Subforum subforum = searchSubforums(subforumId);
-		Subforum subforum = application.getSubforums().get(0);
+		Subforum subforum = searchSubforums(subforumId);
 		
 		if(subforum != null) {
 			subforum.addTopic(topic);

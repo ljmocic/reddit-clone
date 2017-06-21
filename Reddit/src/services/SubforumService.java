@@ -59,6 +59,37 @@ public class SubforumService {
 		return dao.getSubforums().get(0).getTopics();
 	}
 	
+	@GET
+	@Path("/{subforumId}/topics")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Topic> subforumsTopics(@PathParam("subforumId") String subforumId) {
+		
+		Subforum subforum = dao.searchSubforums(subforumId);
+		
+		if(subforum != null) {
+			return subforum.getTopics();
+		}
+		else {
+			return null;
+		}
+	}
+	
+	@GET
+	@Path("/load/{subforumId}/{topicId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Topic loadTopic(	@PathParam("subforumId") String subforumId,
+							@PathParam("topicId") String topicId) {
+		
+		Topic topic = dao.searchTopics(subforumId, topicId);
+		
+		if(topic != null) {
+			return topic;
+		}
+		else {
+			return null;
+		}
+	}
+	
 	@POST
 	@Path("/update")
 	@Produces(MediaType.TEXT_PLAIN)
