@@ -22,7 +22,7 @@ public class Application implements Serializable {
 	private void loadTestData() {
 		User admin = new User("admin", "admin", "email", "name", "surname", "phoneNumber");
 		User temp = new User("temp", "temp", "email", "name", "surname", "phoneNumber");
-		admin.setRole(Config.Role.ADMIN);
+		admin.setRole(Config.ADMIN);
 		users.add(admin);
 		users.add(temp);
 		

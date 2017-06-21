@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import utils.Config;
-import utils.Config.Role;
 
 @SuppressWarnings("serial")
 public class User implements Serializable {
@@ -19,7 +18,7 @@ public class User implements Serializable {
 	private String phoneNumber;
 	private String registrationDate;
 	
-	private Role role;
+	private String role;
 
 	private List<Subforum> followedSubforums;
 	private List<Topic> savedTopics;
@@ -38,7 +37,7 @@ public class User implements Serializable {
 		this.surname = surname;
 		this.phoneNumber = phoneNumber;
 		this.registrationDate = (new Date()).toString();
-		this.role = Config.Role.USER;
+		this.role = Config.USER;
 		this.followedSubforums = new ArrayList<Subforum>();
 		this.savedTopics = new ArrayList<Topic>();
 		this.savedComments = new ArrayList<Comment>();
@@ -104,12 +103,12 @@ public class User implements Serializable {
 		this.registrationDate = registrationDate;
 	}
 	
-	public Role getRole() {
+	public String getRole() {
 		return role;
 	}
 
-	public void setRole(Role type) {
-		this.role = type;
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public List<Subforum> getFollowedSubforums() {

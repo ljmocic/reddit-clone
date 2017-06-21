@@ -96,16 +96,16 @@ public class UserService {
 		
 		if(user != null) {
 
-			if(user.getRole() == Config.Role.ADMIN) {
+			if(user.getRole() == Config.ADMIN) {
 				
 				if(role.equals("admin")) {
-					dao.changeUserRole(username, Config.Role.ADMIN);
+					dao.changeUserRole(username, Config.ADMIN);
 				}
 				else if(role.equals("moderator")) {
-					dao.changeUserRole(username, Config.Role.MODERATOR);
+					dao.changeUserRole(username, Config.MODERATOR);
 				}
 				else if(role.equals("user")) {
-					dao.changeUserRole(username, Config.Role.USER);
+					dao.changeUserRole(username, Config.USER);
 				}
 				
 				return "Successfully updated!";

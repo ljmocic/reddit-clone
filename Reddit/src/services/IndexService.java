@@ -46,7 +46,7 @@ public class IndexService {
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-			if(user.getRole() == Config.Role.MODERATOR || user.getRole() == Config.Role.ADMIN) {
+			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
 				return dao.getUsers();
 			}
 		}

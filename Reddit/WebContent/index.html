@@ -17,7 +17,6 @@
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/indexController.js"></script>
 	<script src="js/inboxController.js"></script>
-	<script src="js/loginController.js"></script>
 	<script src="js/registerController.js"></script>
 	<script src="js/messageController.js"></script>
 
@@ -51,7 +50,7 @@
 
 				<ul class="nav navbar-nav navbar-right ">
 
-					<li class="dropdown">
+					<li id="navbarLoggedIn" class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             ljmocic
                             <span class="caret"></span></a>
@@ -64,8 +63,8 @@
 
 						</ul>
 					</li>
-					<li><a href="" data-toggle="modal" data-target="#loginUser">Login</a></li>
-					<li><a href="" data-toggle="modal" data-target="#registerUser">Register</a></li>
+					<li id="navbarLogin"><a href="" data-toggle="modal" data-target="#loginUser">Login</a></li>
+					<li id="navbarRegister"><a href="" data-toggle="modal" data-target="#registerUser">Register</a></li>
 				</ul>
 			</div>
 		</div>
@@ -75,7 +74,7 @@
 
 		<div class="row">
 
-			<!-- Themes column -->
+			<!-- Topics column -->
 			<div class="col-md-8">
 
 				<div id="subforumName">
@@ -95,20 +94,6 @@
 						</tr>
 					</tbody>
 				</table>
-
-				<!--<br/>
-				<a href="login.html">login</a><br/>
-				<a href="register.html">register</a><br/>
-				<br/>
-				<a href="createSubforum.html">create subforum</a><br/>
-				<a href="updateSubforum.html">update subforum</a><br/>
-				<a href="deleteSubforum.html">delete subforum</a><br/>
-				<br/>
-				<a href="usersManagement.html">users management</a><br/>
-				<br/>
-				<a href="sendMessage.html">send message</a><br/>
-				<a href="inbox.html">inbox</a><br/>-->
-
 			</div>
 
 			<!-- Sidebar -->
@@ -135,22 +120,19 @@
 				</div>
 
 				<!-- User actions -->
-				<div class="well">
+				<div id="userActionsPanel" class="well">
 					<h4>User actions</h4>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addTopic">Add topic</button>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#sendMessage">Send message</button>
 				</div>
 
 				<!-- Admin/Moderator actions -->
-				<div class="well">
+				<div id="adminActionsPanel" class="well">
 					<h4>Moderator panel</h4>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#usersManagement">Users management</button>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addSubforum">Add subforum</button>
-
 				</div>
-
 			</div>
-
 		</div>
 
 		<hr>
@@ -299,38 +281,6 @@
 			</div>
 		</div>
 	</div>
-	<div id="addTopic" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<div id="topicNameModal">
-						<h4 class="modal-title">Topic</h4>
-					</div>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="AddTopicInputName" class="col-sm-2 control-label">Name</label>
-						<div class="col-sm-10">
-							<input name="name" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter subforum name">
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="content" class="col-sm-2 control-label">Content</label>
-						<div class="col-sm-10">
-							<input name="content" type="text" id="AddTopicInputContent" class="form-control" name="content" placeholder="Enter topic content">
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-primary text-right" id="addTopicSubmitButton">Add topic</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<div id="showTopic" class="modal fade" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">

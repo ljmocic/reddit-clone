@@ -1,5 +1,18 @@
+var baseUrl = 'http://localhost:8080/reddit-clone/rest';
+
+
 $(document).ready(function () {
 
+    $('#navbarLoggedIn').hide();
+    $('#adminActionsPanel').hide();
+    $('#userActionsPanel').hide();
+
+    var form = $('#loginForm');
+    form.submit(function (e) {
+        handleLogin(e);
+    });
+
+    checkLoggedInStatus();
 
     loadFollowedSubforum();
 
@@ -15,9 +28,73 @@ $(document).ready(function () {
 
 });
 
+function handleLogin(e) {
+    var form = $('#loginForm');
+    e.preventDefault();
+
+    $.ajax({
+        type: form.attr('method'),
+        url: form.attr('action'),
+        data: form.serialize(),
+        success: function (data) {
+            alert(data);
+            $('.modal').modal('hide');
+            refresh();
+        },
+        error: function (data) {
+            alert('An error occurred.');
+        },
+    });
+
+}
+
+function addNewSubforum(e) {
+    var form = $('#loginForm');
+    e.preventDefault();
+
+    $.ajax({
+        type: form.attr('method'),
+        url: form.attr('action'),
+        data: form.serialize(),
+        success: function (data) {
+            alert(data);
+            $('.modal').modal('hide');
+        },
+        error: function (data) {
+            alert('An error occurred.');
+        },
+    });
+
+    refresh();
+}
+
+function checkLoggedInStatus() {
+    $.ajax({
+        url: baseUrl + "/user/active"
+    }).then(function (user) {
+
+        //alert(user.role);
+
+        if(user != undefined) {
+            $('#navbarLogin').hide();
+            $('#navbarRegister').hide();
+        }
+        if(user.role == "user") {
+            $('#navbarLoggedIn').show();
+            $('#userActionsPanel').show();
+        }
+        else if(user.role == "admin" || user.role == "moderator") {
+            $('#navbarLoggedIn').show();
+            $('#userActionsPanel').show();
+            $('#adminActionsPanel').show();
+        }
+
+    });
+}
+
 function loadFollowedSubforum() {
     $.ajax({
-        url: "http://localhost:8080/reddit-clone/rest/user/active"
+        url: baseUrl + "/user/active"
     }).then(function (user) {
 
         $('#subforumName').empty();
@@ -29,49 +106,7 @@ function loadFollowedSubforum() {
         $('#topics').empty();
 
         user.followedSubforums.forEach(function (subforum) {
-            subforum.topics.forEach(function (topic) {
-                var tableRow = '<tr>' +
-                    '<td>' +
-                    '<table border="1">' +
-                    '<tbody>' +
-                    '<tr>' +
-                    '<td><a href="/reddit-clone/rest/topic/like/' + topic.parentSubforumName + '/' + topic.name + '">Like</a></td>' +
-                    '<td><a href="#" class="topicId">' + topic.name + '</a></td>' +
-                    '<td><a href="/reddit-clone/rest/topic/saveTopic/' + topic.parentSubforumName + '/' + topic.name + '">Save</a></td>' +
-                    '</tr>' +
-                    '<tr>' +
-                    '<td>' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
-                    '<td>submitted by ' + topic.author.username + '</td>' +
-                    '<td></td>' +
-                    '</tr>' +
-                    '<tr>' +
-                    '<td><a href="/reddit-clone/rest/topic/dislike/' + topic.parentSubforumName + '/' + topic.name + '">Dislike</a></td>' +
-                    '<td>' + topic.comments.length + ' comments</td>' +
-                    '<td><a href="">Report</a></td>' +
-                    '</tr>' +
-                    '</tbody>' +
-                    '</table>' +
-                    '</td>'
-                '</tr>'
-
-                $('#topics').append(tableRow);
-
-                $('.topicId').click(function () {
-                    var clickedTopic = $(this).text();
-
-                    $.ajax({
-                        url: 'http://localhost:8080/reddit-clone/rest/subforum/load/' + user.followedSubforums[0].name + '/' + clickedTopic + ''
-                    }).then(function (topic) {
-
-                        $('#topicNameModal').empty();
-                        $('#topicNameModal').append('<h4 class="modal-title">' + topic.name + '</h4>');
-                        $('#topicNameModal').append('<div>' + topic.content + '</div>');
-                        $('#showTopic').modal('show');
-                    });
-
-                });
-
-            });
+            loadSubforum(subforum.name);
         });
 
     });
@@ -79,7 +114,7 @@ function loadFollowedSubforum() {
 
 function loadSubforumLinks() {
     $.ajax({
-        url: "http://localhost:8080/reddit-clone/rest/index/subforums"
+        url: baseUrl + "/index/subforums"
     }).then(function (subforums) {
 
         subforums.forEach(function (subforum) {
@@ -101,7 +136,7 @@ function loadSubforumLinks() {
 
 function loadUserList() {
     $.ajax({
-        url: "http://localhost:8080/reddit-clone/rest/index/users"
+        url: baseUrl + "/index/users"
     }).then(function (users) {
 
         users.forEach(function (user) {
@@ -119,7 +154,7 @@ function loadUserList() {
 
 function loadProfileDetails() {
     $.ajax({
-        url: "http://localhost:8080/reddit-clone/rest/user/active"
+        url: baseUrl + "/user/active"
     }).then(function (user) {
 
         user.savedTopics.forEach(function (savedTopic) {
@@ -148,7 +183,7 @@ function loadProfileDetails() {
 function loadSubforum(subforumId) {
 
     $.ajax({
-        url: 'http://localhost:8080/reddit-clone/rest/subforum/' + subforumId + '/topics'
+        url: baseUrl + '/subforum/' + subforumId + '/topics'
     }).then(function (topics) {
 
         $('#subforumName').empty();
@@ -187,12 +222,24 @@ function loadSubforum(subforumId) {
                 var clickedTopic = $(this).text();
 
                 $.ajax({
-                    url: 'http://localhost:8080/reddit-clone/rest/subforum/load/' + topics[0].parentSubforumName + '/' + clickedTopic + ''
+                    url: baseUrl + '/subforum/load/' + topics[0].parentSubforumName + '/' + clickedTopic + ''
                 }).then(function (topic) {
 
                     $('#topicNameModal').empty();
                     $('#topicNameModal').append('<h4 class="modal-title">' + topic.name + '</h4>');
-                    $('#topicNameModal').append('<div>' + topic.content + '</div>');
+                    //alert(topic.type);
+
+                    if (topic.type == "text") {
+                        $('#topicContentModal').append('<div>' + topic.content + '</div>');
+                    }
+                    else if (topic.type == "link") {
+                        $('#topicContentModal').append('<div><a href="' + topic.content + '">' + topic.content + '</a></div>');
+                    }
+                    else if (topic.type == "image") {
+                        $('#topicContentModal').append('<div><img src="' + topic.content + ' alt="Nema prikaza"></div>');
+                    }
+
+                    $('#topicContentModal').append('<div>' + topic.content + '</div>');
                     $('#showTopic').modal('show');
                 });
 
@@ -212,12 +259,15 @@ function addTopic() {
     var activeSubforumId = $('#subforumNameH3').text();
 
     $.ajax({
-        url: "http://localhost:8080/reddit-clone/rest/topic/create/" + activeSubforumId + "/" + name + "/" + type + "/" + content
+        url: baseUrl + "/topic/create/" + activeSubforumId + "/" + name + "/" + type + "/" + content
     }).then(function (response) {
-        alert(response);
+        //alert(response);
         $('#addTopic').modal('hide');
         loadSubforum(activeSubforumId);
     });
 
 }
 
+function refresh() {
+    location.reload(true);
+}

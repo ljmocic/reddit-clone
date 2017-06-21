@@ -30,6 +30,7 @@ public class Topic implements Serializable {
 		this.parentSubforumName = parentSubforumName;
 		this.comments = new ArrayList<Comment>();
 		this.content = content;
+		this.type = "text";
 	}
 
 	public String getName() {

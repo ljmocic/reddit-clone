@@ -44,7 +44,7 @@ public class TopicService {
 		if(user != null) {
 
 			Topic topic = new Topic(topicId, content, user, subforumId);
-			//topic.setType(type);
+			topic.setType(type);
 			
 			dao.addTopic(subforumId, topic);
 			

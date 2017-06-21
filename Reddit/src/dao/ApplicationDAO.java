@@ -15,7 +15,6 @@ import beans.Subforum;
 import beans.Topic;
 import beans.User;
 import utils.Config;
-import utils.Config.Role;
 
 public class ApplicationDAO {
 	
@@ -174,7 +173,7 @@ public class ApplicationDAO {
 		}
 	}
 
-	public void changeUserRole(String username, Role role) {
+	public void changeUserRole(String username, String role) {
 		for(User user: application.getUsers()) {
 			if(user.getUsername().equals(username)) {
 				user.setRole(role);
