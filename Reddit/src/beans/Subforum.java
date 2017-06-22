@@ -33,9 +33,9 @@ public class Subforum implements Serializable {
 	private void initData() {
 		User user = new User("username", "password", "email", "name", "surname", "phoneNumber");
 		
-		topics.add(new Topic("topic1", "content1", user, name));
-		topics.add(new Topic("topic2", "content2", user, name));
-		topics.add(new Topic("topic3", "content3", user, name));
+		topics.add(new Topic("topic1" + name, "content1", user, name));
+		topics.add(new Topic("topic2"+ name, "content2", user, name));
+		topics.add(new Topic("topic3"+ name, "content3", user, name));
 	}
 
 	public String getName() {

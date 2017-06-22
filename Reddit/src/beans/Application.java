@@ -21,15 +21,16 @@ public class Application implements Serializable {
 	
 	private void loadTestData() {
 		User admin = new User("admin", "admin", "email", "name", "surname", "phoneNumber");
+		admin.setRole(Config.ADMIN);
 		User temp = new User("temp", "temp", "email", "name", "surname", "phoneNumber");
 		admin.setRole(Config.ADMIN);
 		users.add(admin);
 		users.add(temp);
 		
-		Subforum subforum1 = new Subforum("test1", "test", "test", "test", null);
+		Subforum subforum1 = new Subforum("test1", "test", "test", "test", admin);
 		subforums.add(subforum1);
-		subforums.add(new Subforum("test2", "test", "test", "test", null));
-		subforums.add(new Subforum("test3", "test", "test", "test", null));
+		subforums.add(new Subforum("test2", "test", "test", "test", admin));
+		subforums.add(new Subforum("test3", "test", "test", "test", admin));
 		
 		admin.followForum(subforum1);
 	}

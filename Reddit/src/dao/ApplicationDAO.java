@@ -183,6 +183,9 @@ public class ApplicationDAO {
 		}
 	}
 
-	
+	public void deleteTopic(String subforumId, Topic topic) {
+		Subforum subforum = searchSubforums(subforumId);
+		subforum.getTopics().remove(topic);
+	}
 	
 }

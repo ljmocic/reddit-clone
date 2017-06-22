@@ -96,7 +96,7 @@ public class UserService {
 		
 		if(user != null) {
 
-			if(user.getRole() == Config.ADMIN) {
+			if(user.getRole().equals(Config.ADMIN)) {
 				
 				if(role.equals("admin")) {
 					dao.changeUserRole(username, Config.ADMIN);

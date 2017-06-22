@@ -56,25 +56,27 @@ public class TopicService {
 	}
 	
 	@POST
-	@Path("/update")
+	@Path("/update/{subforumId}/{topicId}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String update(	@FormParam("name") String name, 
-							@FormParam("description") String description, 
-							@FormParam("rules") String rules){
+	public String update(	@PathParam("subforumId") String subforumId,
+							@PathParam("topicId") String topicId,
+							@FormParam("name") String name, 
+							@FormParam("type") String type, 
+							@FormParam("content") String content){
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 
-			Subforum subforum = dao.searchSubforums(name);
+			Topic topic = dao.searchTopics(subforumId, topicId);
 			
-			if(subforum != null) {
-				subforum.setName(name);
-				subforum.setDescription(description);
-				subforum.setRules(rules);
+			if(topic != null) {
+				topic.setName(name);
+				topic.setType(type);
+				topic.setContent(content);
 				
-				return "Updated topic " + subforum.toString();
+				return "Updated topic " + topic.toString();
 			}
 			else {
 				return "Failed to update a topic";
@@ -87,22 +89,25 @@ public class TopicService {
 	}
 	
 	
-	@POST
-	@Path("/delete")
+	@GET
+	@Path("/delete/{subforumId}/{topicId}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String delete(@FormParam("name") String name){
+	public String delete(	@PathParam("subforumId") String subforumId,
+							@PathParam("topicId") String topicId){
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
+		Topic topic = dao.searchTopics(subforumId, topicId);
+		
 		if(user != null) {
 
-			if(dao.searchSubforums(name) != null) {
-				dao.deleteSubforum(name);
-				return "topic deleted " + name;
+			if(topic != null) {
+				dao.deleteTopic(subforumId, topic);
+				return "topic deleted " + topic.getName();
 			}
 			else {
-				return "Error deleting " + name;
+				return "Error deleting topic";
 			}
 		}
 		else {
@@ -121,16 +126,23 @@ public class TopicService {
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-
-			String subforumId1 = "test1";
 			
-			Topic topic = dao.searchTopics(subforumId1, topicId);
+			Topic topic = dao.searchTopics(subforumId, topicId);
 			
 			if(topic != null) {
 				if(!user.getLikedTopics().contains(topic)) {
-					topic.like();
-					user.like(topic);
-					return "Successfully liked!";
+					
+					// if user disliked before, remove dislike and put like
+					if(user.getDislikedTopics().contains(topic)) {
+						user.getDislikedTopics().remove(topic);
+						topic.removeDislike();
+						return "Removed like!";
+					}
+					else {
+						topic.like();
+						user.like(topic);
+						return "Successfully liked!";
+					}
 				}
 				else {
 					return "Already liked!";
@@ -156,16 +168,23 @@ public class TopicService {
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-
-			String subforumId1 = "test1";
 			
-			Topic topic = dao.searchTopics(subforumId1, topicId);
+			Topic topic = dao.searchTopics(subforumId, topicId);
 			
 			if(topic != null) {
 				if(!user.getDislikedTopics().contains(topic)) {
-					topic.dislike();
-					user.dislike(topic);
-					return "Successfully disliked!";
+					
+					// if user liked before, remove like and put dislike
+					if(user.getLikedTopics().contains(topic)) {
+						user.getLikedTopics().remove(topic);
+						topic.removeLike();
+						return "Removed like!";
+					}
+					else {
+						topic.dislike();
+						user.dislike(topic);
+						return "Successfully disliked!";
+					}
 				}
 				else {
 					return "Already disliked!";
@@ -244,11 +263,11 @@ public class TopicService {
 	}
 	
 	@POST
-	@Path("/report/{subforumId}/{topicId}")
+	@Path("/report")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String report(	@PathParam("subforumId") String subforumId,
-								@PathParam("topicId") String topicId,
-								@FormParam("complaintText") String complaintText) {
+	public String report(	@FormParam("subforumId") String subforumId,
+							@FormParam("topicId") String topicId,
+							@FormParam("complaintText") String complaintText) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
@@ -261,9 +280,7 @@ public class TopicService {
 			if(topic != null && subforum != null) {
 				// TODO real implementation
 				User moderator = subforum.getResponsibleModerator();
-				moderator.addMessage(new Message(	user.getName(), 
-													subforum.getResponsibleModerator().getName(), 
-													complaintText));
+				moderator.addMessage(new Message(user.getName(), subforum.getResponsibleModerator().getName(), complaintText));
 				return "Reported" + topic.getName();
 			}
 			else {

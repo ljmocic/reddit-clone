@@ -121,5 +121,13 @@ public class Topic implements Serializable {
 	public String toString() {
 		return "Topic [name=" + name + ", author=" + author;
 	}
+
+	public void removeLike() {
+		this.likes--;
+	}
+	
+	public void removeDislike() {
+		this.dislikes--;
+	}
 	
 }

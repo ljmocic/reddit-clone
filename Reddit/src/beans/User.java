@@ -20,7 +20,7 @@ public class User implements Serializable {
 	
 	private String role;
 
-	private List<Subforum> followedSubforums;
+	private List<String> followedSubforums;
 	private List<Topic> savedTopics;
 	private List<Comment> savedComments;
 	private List<Topic> likedTopics;
@@ -38,7 +38,7 @@ public class User implements Serializable {
 		this.phoneNumber = phoneNumber;
 		this.registrationDate = (new Date()).toString();
 		this.role = Config.USER;
-		this.followedSubforums = new ArrayList<Subforum>();
+		this.followedSubforums = new ArrayList<String>();
 		this.savedTopics = new ArrayList<Topic>();
 		this.savedComments = new ArrayList<Comment>();
 		this.likedTopics = new ArrayList<Topic>();
@@ -111,11 +111,11 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public List<Subforum> getFollowedSubforums() {
+	public List<String> getFollowedSubforums() {
 		return followedSubforums;
 	}
 
-	public void setFollowedSubforums(List<Subforum> followedSubforums) {
+	public void setFollowedSubforums(List<String> followedSubforums) {
 		this.followedSubforums = followedSubforums;
 	}
 
@@ -196,7 +196,16 @@ public class User implements Serializable {
 	}
 
 	public void followForum(Subforum subforum) {
-		followedSubforums.add(subforum);
+		followedSubforums.add(subforum.getName());
+	}
+
+	public boolean followsSubforum(String subforumId) {
+		for(String followedSubforum: followedSubforums) {
+			if(followedSubforum.equals(subforumId)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

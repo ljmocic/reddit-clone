@@ -45,7 +45,7 @@ public class SubforumService {
 		if(user != null) {
 			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
 				if(dao.searchSubforums(name) == null) {
-					Subforum subforum = new Subforum(name, description, rules, null, null);
+					Subforum subforum = new Subforum(name, description, rules, null, user);
 					dao.addSubforum(subforum);
 					return "Added a forum" + subforum.toString();
 				}
@@ -168,7 +168,7 @@ public class SubforumService {
 		}
 	}
 	
-	@POST
+	@GET
 	@Path("/follow/{subforumId}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String follow(@PathParam("subforumId") String subforumId){
@@ -179,7 +179,7 @@ public class SubforumService {
 		Subforum subforum = dao.searchSubforums(subforumId);
 		
 		if(user != null) {
-			if(subforum != null) {
+			if(subforum != null && !user.followsSubforum(subforumId)) {
 				user.followForum(subforum);
 				return "Followed subforum " + subforum.getName();
 			}
