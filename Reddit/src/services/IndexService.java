@@ -70,6 +70,7 @@ public class IndexService {
 			if(receiver != null) {
 				Message message = new Message(user.getUsername(), receiver.getUsername(), content);
 				receiver.addMessage(message);
+				dao.saveDatabase();
 				
 				return "Message sent!";
 			}

@@ -25,8 +25,6 @@ public class CommentService {
 	@Path("/create")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String create(@FormParam("text") String text) {
-
-		
 		return "Added a comment";
 	}
 	

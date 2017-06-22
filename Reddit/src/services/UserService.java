@@ -71,6 +71,7 @@ public class UserService {
 			
 			if(user.getPassword().equals(password) == true) {
 				session.setAttribute("user", user);
+				dao.saveDatabase();
 				return "Successfully logged in!";
 			}
 			else {
@@ -107,6 +108,7 @@ public class UserService {
 				else if(role.equals("user")) {
 					dao.changeUserRole(username, Config.USER);
 				}
+				dao.saveDatabase();
 				
 				return "Successfully updated!";
 			}

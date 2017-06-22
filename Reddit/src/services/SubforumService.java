@@ -64,13 +64,6 @@ public class SubforumService {
 	}
 	
 	@GET
-	@Path("/topics")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<Topic> subforums() {
-		return dao.getSubforums().get(0).getTopics();
-	}
-	
-	@GET
 	@Path("/{subforumId}/topics")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Topic> subforumsTopics(@PathParam("subforumId") String subforumId) {
@@ -133,6 +126,7 @@ public class SubforumService {
 				subforum.setName(name);
 				subforum.setDescription(description);
 				subforum.setRules(rules);
+				dao.saveDatabase();
 				
 				return "Updated forum " + subforum.toString();
 			}
@@ -181,6 +175,7 @@ public class SubforumService {
 		if(user != null) {
 			if(subforum != null && !user.followsSubforum(subforumId)) {
 				user.followForum(subforum);
+				dao.saveDatabase();
 				return "Followed subforum " + subforum.getName();
 			}
 			else {

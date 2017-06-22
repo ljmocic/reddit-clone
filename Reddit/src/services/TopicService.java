@@ -75,6 +75,7 @@ public class TopicService {
 				topic.setName(name);
 				topic.setType(type);
 				topic.setContent(content);
+				dao.saveDatabase();
 				
 				return "Updated topic " + topic.toString();
 			}
@@ -136,6 +137,7 @@ public class TopicService {
 					if(user.getDislikedTopics().contains(topic)) {
 						user.getDislikedTopics().remove(topic);
 						topic.removeDislike();
+						dao.saveDatabase();
 						return "Removed like!";
 					}
 					else {
@@ -178,11 +180,13 @@ public class TopicService {
 					if(user.getLikedTopics().contains(topic)) {
 						user.getLikedTopics().remove(topic);
 						topic.removeLike();
+						dao.saveDatabase();
 						return "Removed like!";
 					}
 					else {
 						topic.dislike();
 						user.dislike(topic);
+						dao.saveDatabase();
 						return "Successfully disliked!";
 					}
 				}
@@ -215,6 +219,7 @@ public class TopicService {
 			if(topic != null) {
 				if(!user.getSavedTopics().contains(topic)) {
 					user.saveTopic(topic);
+					dao.saveDatabase();
 					return "Successfully saved!";
 				}
 				else {
@@ -247,6 +252,7 @@ public class TopicService {
 			if(comment != null) {
 				if(!user.getSavedComments().contains(comment)) {
 					user.saveComment(comment);
+					dao.saveDatabase();
 					return "Successfully saved!";
 				}
 				else {
@@ -281,6 +287,7 @@ public class TopicService {
 				// TODO real implementation
 				User moderator = subforum.getResponsibleModerator();
 				moderator.addMessage(new Message(user.getName(), subforum.getResponsibleModerator().getName(), complaintText));
+				dao.saveDatabase();
 				return "Reported" + topic.getName();
 			}
 			else {

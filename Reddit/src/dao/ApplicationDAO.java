@@ -163,8 +163,6 @@ public class ApplicationDAO {
 	}
 
 	public void addTopic(String subforumId, Topic topic) {
-		// TODO update with real id later
-		//Subforum subforum = searchSubforums(subforumId);
 		Subforum subforum = searchSubforums(subforumId);
 		
 		if(subforum != null) {
@@ -186,6 +184,7 @@ public class ApplicationDAO {
 	public void deleteTopic(String subforumId, Topic topic) {
 		Subforum subforum = searchSubforums(subforumId);
 		subforum.getTopics().remove(topic);
+		saveDatabase();
 	}
 	
 }
