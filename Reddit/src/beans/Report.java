@@ -7,14 +7,25 @@ public class Report implements Serializable {
 
 	private String text;
 	private String date;
-	private Topic enitityOfComplaint;
+	private Subforum subforum;
+	private Topic topic;
 	private String userId;
-
-	public Report(String text, Topic enitityOfComplaint, String userId) {
+	
+	public Report(String text, Subforum subforum, String userId) {
 		super();
 		this.text = text;
 		this.date = null;
-		this.enitityOfComplaint = enitityOfComplaint;
+		this.subforum = subforum;
+		this.topic = null;
+		this.userId = userId;
+	}
+	
+	public Report(String text, Topic topic, String userId) {
+		super();
+		this.text = text;
+		this.date = null;
+		this.subforum = null;
+		this.topic = topic;
 		this.userId = userId;
 	}
 
@@ -34,12 +45,20 @@ public class Report implements Serializable {
 		this.date = date;
 	}
 
-	public Topic getEnitityOfComplaint() {
-		return enitityOfComplaint;
+	public Subforum getSubforum() {
+		return subforum;
 	}
 
-	public void setEnitityOfComplaint(Topic enitityOfComplaint) {
-		this.enitityOfComplaint = enitityOfComplaint;
+	public void setSubforum(Subforum subforum) {
+		this.subforum = subforum;
+	}
+
+	public Topic getTopic() {
+		return topic;
+	}
+
+	public void setTopic(Topic topic) {
+		this.topic = topic;
 	}
 
 	public String getUserId() {
@@ -49,5 +68,7 @@ public class Report implements Serializable {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
+
+	
 
 }

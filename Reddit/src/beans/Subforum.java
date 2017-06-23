@@ -30,12 +30,10 @@ public class Subforum implements Serializable {
 		initData();
 	}
 
-	private void initData() {
-		User user = new User("username", "password", "email", "name", "surname", "phoneNumber");
-		
-		topics.add(new Topic("topic1" + name, "content1", user.getUsername(), name));
-		topics.add(new Topic("topic2"+ name, "content2", user.getUsername(), name));
-		topics.add(new Topic("topic3"+ name, "content3", user.getUsername(), name));
+	private void initData() {		
+		topics.add(new Topic("topic1" + name, "content1", "admin", name));
+		topics.add(new Topic("topic2"+ name, "content2", "admin", name));
+		topics.add(new Topic("topic3"+ name, "content3", "admin", name));
 	}
 
 	public String getName() {

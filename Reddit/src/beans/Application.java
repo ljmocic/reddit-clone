@@ -20,19 +20,31 @@ public class Application implements Serializable {
 	}
 	
 	private void loadTestData() {
-		User admin = new User("admin", "admin", "email", "name", "surname", "phoneNumber");
+		
+		// add administrator
+		User admin = new User("admin", "admin", "admin@gmail.com", "ljubisa", "mocic", "phoneNumber");
 		admin.setRole(Config.ADMIN);
-		User temp = new User("temp", "temp", "email", "name", "surname", "phoneNumber");
-		admin.setRole(Config.ADMIN);
+		
+		// add moderators
+		User mod1 = new User("mod1", "mod1", "email", "name", "surname", "phoneNumber");
+		User mod2 = new User("mod2", "mod2", "email", "name", "surname", "phoneNumber");
+		User mod3 = new User("mod3", "mod3", "email", "name", "surname", "phoneNumber");
+		mod1.setRole(Config.MODERATOR);
+		mod2.setRole(Config.MODERATOR);
+		mod3.setRole(Config.MODERATOR);
 		users.add(admin);
-		users.add(temp);
+		users.add(mod1);
+		users.add(mod2);
+		users.add(mod3);
 		
-		Subforum subforum1 = new Subforum("test1", "test", "test", "test", admin);
-		subforums.add(subforum1);
-		subforums.add(new Subforum("test2", "test", "test", "test", admin));
-		subforums.add(new Subforum("test3", "test", "test", "test", admin));
+		// init subforums
+		subforums.add(new Subforum("android", "test subforum description", "rules", "iconPath", mod1));
+		subforums.add(new Subforum("ios", "test subforum description", "rules", "iconPath", mod2));
+		subforums.add(new Subforum("windows", "test subforum description", "rules", "iconPath", mod3));
 		
-		admin.followForum(subforum1);
+		// add classic user
+		User user = new User("user", "user", "user@gmail.com", "user", "user", "phoneNumber");
+		users.add(user);
 	}
 
 	public List<Subforum> getSubforums() {

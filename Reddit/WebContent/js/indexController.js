@@ -35,6 +35,7 @@ $(document).ready(function () {
         handleForm(e, messageFormId);
     });
 
+    // subforum forms handlers
     var addSubforumFormId = 'addSubforumForm';
     $('#' + addSubforumFormId).submit(function (e) {
         handleForm(e, addSubforumFormId);
@@ -45,21 +46,38 @@ $(document).ready(function () {
         handleForm(e, editSubforumFormId);
     });
 
+    var reportSubforumFormId = 'reportSubforumForm';
+    $('#' + reportSubforumFormId).submit(function (e) {
+        handleForm(e, reportSubforumFormId);
+    });
+
+    // topic handlers
     var reportTopicFormId = 'reportTopicForm';
     $('#' + reportTopicFormId).submit(function (e) {
         handleForm(e, reportTopicFormId);
     });
 
+    // message handlers
     var sendMessageFormId = 'sendMessageForm';
     $('#' + sendMessageFormId).submit(function (e) {
         handleForm(e, sendMessageFormId);
     });
 
+    // buttons setup
     $('#addTopicForm').submit(function (e) {
         addTopic(e);
     });
 
-    // buttons setup
+    $('#searchPressed').click(function () {
+        performSearch();
+    });
+
+    $('#searchQuery').on('keypress', function (e) {
+        if(e.which === 13){
+            performSearch();
+        }
+    });
+
     $('#editSubforumButton').click(function () {
         editSubforum();
     });
@@ -70,10 +88,6 @@ $(document).ready(function () {
 
     $('#logout').click(function () {
         logoutUser();
-    });
-
-    $('#searchPressed').click(function () {
-        performSearch();
     });
 
 });
@@ -93,6 +107,12 @@ function editSubforum() {
     $('#editSubforum').modal('show');
 }
 
+function reportSubforum() {
+    var activeSubforumId = $('#subforumNameH3').text();
+    $('#reportSubforumFormName').val(activeSubforumId);
+    $('#reportSubforum').modal('show');
+}
+
 function deleteSubforum() {
     var activeSubforumId = $('#subforumNameH3').text();
     $.ajax({
@@ -104,14 +124,12 @@ function deleteSubforum() {
 }
 
 function logoutUser() {
-
     $.ajax({
         url: baseUrl + "/user/logout"
     }).then(function (message) {
         alert(message);
         refresh();
     });
-
 }
 
 function handleForm(e, formId) {
@@ -135,7 +153,7 @@ function handleForm(e, formId) {
 
 function loadMessages() {
     $.ajax({
-        url: "http://localhost:8080/reddit-clone/rest/index/messages"
+        url: baseUrl + "/index/messages"
     }).then(function (messages) {
 
         var messageId = 0;
@@ -144,11 +162,10 @@ function loadMessages() {
             
             var messageRow = '<p>' + message.senderId + " " + message.content;
 
-            if(message.hasReport == true) {
+            if(message.hasReport == true && message.seen == false) {
                 messageRow += '&nbsp;<button type="button" id="deleteReport' + messageId + '" class="btn btn-info btn-sm">Delete</button>';
                 messageRow += '&nbsp;<button type="button" id="warnReport' + messageId + '" class="btn btn-info btn-sm">Warn</button>';
                 messageRow += '&nbsp;<button type="button" id="rejectReport' + messageId + '" class="btn btn-info btn-sm">Reject</button>';
-
             }
             
             
@@ -169,17 +186,17 @@ function loadMessages() {
             if(message.hasReport == true) {
                 var tempMessageId = messageId;
                 $("#deleteReport" + tempMessageId).click(function () {
-                    deleteEntityNotification(tempMessageId);
+                    deleteEntityNotification(message, tempMessageId);
                 });
 
                 $("#warnReport" + tempMessageId).click(function () {
                 var tempMessageId = messageId;
-                    warnEntityNotification(tempMessageId);
+                    warnEntityNotification(message, tempMessageId);
                 });
 
                 $("#rejectReport" + tempMessageId).click(function () {
                 var tempMessageId = messageId;
-                    rejectEntityNotification(tempMessageId);
+                    rejectEntityNotification(message, tempMessageId);
                 });
             }
 
@@ -191,20 +208,52 @@ function loadMessages() {
     });
 }
 
-function deleteEntityNotification(messageId) {
+function deleteEntityNotification(message, messageId) {
+    var path;
+    if(message.report.topic != undefined) {
+        path = "/topic/report/delete/";
+    }
+    else if(message.report.subforum != undefined){
+        path = "/subforum/report/delete/";
+    }
+
     $.ajax({
-        url: baseUrl + "/topic/report/delete/" + messageId
+        url: baseUrl + path + messageId
     }).then(function (message) {
         alert(message);
     });
 }
 
-function warnEntityNotification(messageId) {
-    
+function warnEntityNotification(message, messageId) {
+    var path;
+    if(message.report.topic != undefined) {
+        path = "/topic/warn/delete/";
+    }
+    else if(message.report.subforum != undefined){
+        path = "/subforum/warn/delete/";
+    }
+
+    $.ajax({
+        url: baseUrl + path + messageId
+    }).then(function (message) {
+        alert(message);
+    });
 }
 
-function rejectEntityNotification(messageId) {
+function rejectEntityNotification(message, messageId) {
+    var path;
+    if(message.report.topic != undefined) {
+        path = "/topic/report/reject/";
+    }
+    else if(message.report.subforum != undefined){
+        path = "/subforum/report/reject/";
+    }
 
+    $.ajax({
+        url: baseUrl + path + messageId
+    }).then(function (message) {
+        alert(message);
+    });
 }
 
 function setMessageSeen(messageId) {
@@ -255,6 +304,7 @@ function loadFollowedSubforum() {
         else {
             $('#topics').text("User doesn't follow any subforums!");
         }
+        $('#addTopicButton').hide();
         
     });
 }
@@ -266,7 +316,7 @@ function loadSubforumLinks() {
 
         subforums.forEach(function (subforum) {
             $('#subforumsLinks').append(
-                '<p><a class="subforumLink" href="#">' + subforum.name + " " + subforum.description + '</a></p>'
+                '<p><a class="subforumLink" id="' + subforum.name + '" href="#">' + subforum.name + " " + subforum.description + '</a></p>'
             );
 
             $('#subforumsSidebarList').append('<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a>&nbsp;');
@@ -274,6 +324,7 @@ function loadSubforumLinks() {
 
         $(".subforumLink").click(function () {
             var clickedButtonId = $(this).attr('id');
+            $('.modal').modal('hide');
             loadSubforum(clickedButtonId);
         });
 
@@ -428,11 +479,15 @@ function loadSubforum(subforumId, followedForumsMode) {
         }
         else {
             $('#subforumName').empty();
-            $('#subforumName').append('<h3 id="subforumNameH3">' + topics[0].parentSubforumName + '</h3><a id="followSubforumLink" href="#">Follow</a>');
+            $('#subforumName').append('<h3 id="subforumNameH3">' + topics[0].parentSubforumName + '</h3><a id="followSubforumLink" href="#">Follow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
             $('#followSubforumLink').click(function () {
                 followSubforum();
             });
+            $('#reportSubforumLink').click(function () {
+                reportSubforum();
+            });
             $('#topics').empty();
+            $('#addTopicButton').show();
         }
 
         topics.forEach(function (topic) {
@@ -461,7 +516,6 @@ function loadSubforum(subforumId, followedForumsMode) {
             '</tr>'
 
             $('#topics').append(tableRow);
-
         });
 
         $('.topicId').click(function () {

@@ -11,6 +11,7 @@ import java.util.List;
 
 import beans.Application;
 import beans.Comment;
+import beans.Message;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
@@ -185,6 +186,17 @@ public class ApplicationDAO {
 		Subforum subforum = searchSubforums(subforumId);
 		subforum.getTopics().remove(topic);
 		saveDatabase();
+	}
+
+	public void sendMessageToAdministrators(Message message) {
+		for(User user: application.getUsers()) {
+			Message copyMessage = new Message(message);
+			if(user.getRole().equals(Config.ADMIN)) {
+				copyMessage.setReceiverId(user.getUsername());
+				user.addMessage(copyMessage);
+				return;
+			}
+		}
 	}
 	
 }

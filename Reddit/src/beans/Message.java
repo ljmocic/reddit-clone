@@ -32,6 +32,17 @@ public class Message implements Serializable{
 		this.hasReport = hasReport;
 		this.report = report;
 	}
+	
+	
+	public Message(Message message) {
+		super();
+		this.senderId = message.getSenderId();
+		this.receiverId = message.getSenderId();
+		this.content = message.getContent();
+		this.seen = message.isSeen();
+		this.hasReport = message.isHasReport();
+		this.report = message.getReport();
+	}
 
 	public String getSenderId() {
 		return senderId;

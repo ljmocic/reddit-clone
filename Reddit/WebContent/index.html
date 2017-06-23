@@ -119,7 +119,7 @@
 				<!-- User actions -->
 				<div id="userActionsPanel" class="well">
 					<h4>User actions</h4>
-					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addTopic">Add topic</button>
+					<button id="addTopicButton" type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addTopic">Add topic</button>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#sendMessage">Send message</button>
 				</div>
 
@@ -128,6 +128,7 @@
 					<h4>Moderator panel</h4>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#usersManagement">Users management</button>
 					<button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#addSubforum">Add subforum</button>
+					<br>
 					<button type="button" class="btn btn-info btn-md" id="editSubforumButton">Edit subforum</button>
 					<button type="button" class="btn btn-info btn-md" id="deleteSubforumButton">Delete subforum</button>
 				</div>
@@ -366,7 +367,7 @@
 							</div>
 							<div class="form-group">
 								<div class="col-sm-offset-2 col-sm-10">
-									<button type="submit" id="reportTopicSubmitButton" class="btn btn-primary text-right">Add topic</button>
+									<button type="submit" id="reportTopicSubmitButton" class="btn btn-primary text-right">Send report</button>
 								</div>
 							</div>
 						</form>
@@ -461,6 +462,37 @@
 					</div>
 				</div>
 
+			</div>
+		</div>
+		<div id="reportSubforum" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Report subforum</h4>
+					</div>
+					<div class="modal-body">
+						<form id="reportSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/report" method="POST" role="form">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input name="subforumId" type="text" class="form-control" id="reportSubforumFormName" placeholder="Enter subforum name" readonly>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="reportText" class="col-sm-2 control-label">Report</label>
+								<div class="col-sm-10">
+									<textarea name="complaintText" id="reportText" class="form-control" placeholder="Enter report text" rows="5"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Report subforum</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 

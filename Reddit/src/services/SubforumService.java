@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import beans.Message;
+import beans.Report;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
@@ -149,13 +150,16 @@ public class SubforumService {
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-			if(dao.searchSubforums(subforumId) != null) {
-				dao.deleteSubforum(subforumId);
-				return "Forum deleted " + subforumId;
+			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
+				if(dao.searchSubforums(subforumId) != null) {
+					dao.deleteSubforum(subforumId);
+					return "Forum deleted " + subforumId;
+				}
+				else {
+					return "Error deleting " + subforumId;
+				}
 			}
-			else {
-				return "Error deleting " + subforumId;
-			}
+			return "You do not have permission to delete subforum!";
 		}
 		else {
 			return "Must be logged in to add subforum!";
@@ -188,32 +192,115 @@ public class SubforumService {
 	}
 	
 	@POST
-	@Path("/report/{subforumId}")
+	@Path("/report")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String report(	@PathParam("subforumId") String subforumId, 
+	public String report(	@FormParam("subforumId") String subforumId,
 							@FormParam("complaintText") String complaintText) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
-		Subforum subforum = dao.searchSubforums(subforumId);
-		
 		if(user != null) {
+			
+			Subforum subforum = dao.searchSubforums(subforumId);
+			
 			if(subforum != null) {
-				// TODO real implementation
-				User moderator = subforum.getResponsibleModerator();
-				moderator.addMessage(new Message(	user.getName(), 
-													subforum.getResponsibleModerator().getName(), 
-													complaintText));
 				
-				return "Reported subforum " + subforum.getName();
+				Report report =  new Report(complaintText, subforum, user.getUsername());
+				
+				User moderator = dao.searchUser(subforum.getResponsibleModerator().getUsername());
+				
+				Message message = new Message(user.getUsername(), moderator.getUsername(), complaintText, true, report);
+				
+				// Notify administrators/moderators
+				dao.sendMessageToAdministrators(message);
+				dao.saveDatabase();
+				
+				return "Reported " + subforum.getName();
 			}
 			else {
-				return "Error while trying to report subforum";
+				return "Failed to report";
 			}
 		}
 		else {
-			return "Must be logged in to report subforum!";
+			return "Must be logged to report topic!";
+		}
+	}
+	
+	@GET
+	@Path("/report/delete/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String deleteReport(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Report report = user.getMessages().get(messageId - 1).getReport();
+			
+			User admin = dao.searchUser("admin");
+			
+			user.addMessage(new Message(admin.getUsername(), user.getUsername(), 
+			"Thank you for report! Reported subforum will be deleted."));
+			
+			admin.addMessage(new Message(user.getUsername(), admin.getUsername(),
+			"Warning, the subforum " + report.getSubforum().getName() + " has been reported for violating rules. You have 24 to delete it!"));
+			
+			return "Report author and topic author has beed notified.";
+		}
+		else {
+			return "Must be logged to notify report !";
+		}
+	}
+	
+	@GET
+	@Path("/report/warn/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String warnReport(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Report report = user.getMessages().get(messageId - 1).getReport();
+			
+			User moderator = report.getSubforum().getResponsibleModerator();
+			
+			user.addMessage(new Message("", user.getUsername(), 
+			"Thank you for report! Reported subforum author is notified about breaking rules."));
+			
+			moderator.addMessage(new Message("", moderator.getUsername(),
+			"Warning, the subforum " + report.getSubforum().getName() + " has been reported for violating rules."));
+			
+			return "Administrator has been notified.";
+		}
+		else {
+			return "Must be logged in!";
+		}
+	}
+	
+	@GET
+	@Path("/report/reject/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String rejectReport(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Report report = user.getMessages().get(messageId - 1).getReport();
+			User reportAuthor = dao.searchUser(report.getUserId());
+			reportAuthor.addMessage(new Message(user.getUsername(), 
+												reportAuthor.getUsername(), 
+			"Your report on subforum " + report.getSubforum().getName() + " has been rejected!"));
+			
+			return "Report successfully rejected, report author is notified.";
+		}
+		else {
+			return "Must be logged in!";
 		}
 	}
 	

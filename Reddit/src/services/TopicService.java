@@ -287,14 +287,15 @@ public class TopicService {
 			if(topic != null && subforum != null) {
 				
 				Report report =  new Report(complaintText, topic, user.getUsername());
-				
 				User moderator = dao.searchUser(subforum.getResponsibleModerator().getUsername());
 				
-				moderator.addMessage(new Message(user.getUsername(), 
-												moderator.getUsername(), 
-												complaintText, true, report));
+				Message message = new Message(user.getUsername(), moderator.getUsername(), complaintText, true, report);
 				
+				// Notify administrators/moderators
+				moderator.addMessage(message);
+				dao.sendMessageToAdministrators(message);
 				dao.saveDatabase();
+				
 				return "Reported " + topic.getName();
 			}
 			else {
@@ -322,7 +323,7 @@ public class TopicService {
 			
 			User reportAuthor = dao.searchUser(report.getUserId());
 			
-			String entityAuthorId = report.getEnitityOfComplaint().getAuthor();
+			String entityAuthorId = report.getTopic().getAuthor();
 			User entityAuthor = dao.searchUser(entityAuthorId);
 			
 			reportAuthor.addMessage(new Message(user.getUsername(), 
@@ -331,12 +332,67 @@ public class TopicService {
 			
 			entityAuthor.addMessage(new Message(user.getUsername(), 
 					entityAuthor.getUsername(), 
-					"The topic " + report.getEnitityOfComplaint().getName() + " has been reported for violating rules.You have 24h to delete it."));
+					"The topic " + report.getTopic().getName() + " has been reported for violating rules.You have 24h to delete it."));
 			
 			return "Report author and topic author has beed notified.";
 		}
 		else {
-			return "Must be logged to delete report !";
+			return "Must be logged to notify report !";
+		}
+	}
+	
+	@GET
+	@Path("/report/warn/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String warnReport(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Report report = user.getMessages().get(messageId - 1).getReport();
+			
+			User reportAuthor = dao.searchUser(report.getUserId());
+			
+			String entityAuthorId = report.getTopic().getAuthor();
+			User entityAuthor = dao.searchUser(entityAuthorId);
+			
+			reportAuthor.addMessage(new Message(user.getUsername(), 
+												reportAuthor.getUsername(), 
+												"Thank you for report! Reported topic author is notified about breaking rules."));
+			
+			entityAuthor.addMessage(new Message(user.getUsername(), 
+					entityAuthor.getUsername(), 
+					"Warning, the topic " + report.getTopic().getName() + " has been reported for violating rules."));
+			
+			return "Report author and topic author has been notified.";
+		}
+		else {
+			return "Must be logged in!";
+		}
+	}
+	
+	@GET
+	@Path("/report/reject/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String rejectReport(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Report report = user.getMessages().get(messageId - 1).getReport();
+			User reportAuthor = dao.searchUser(report.getUserId());
+			reportAuthor.addMessage(new Message(user.getUsername(), 
+												reportAuthor.getUsername(), 
+												"Your report on " + report.getTopic().getName() + " has been rejected!"));
+			
+			return "Report successfully rejected, report author is notified.";
+		}
+		else {
+			return "Must be logged in!";
 		}
 	}
 	
