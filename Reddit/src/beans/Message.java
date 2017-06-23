@@ -10,14 +10,29 @@ public class Message implements Serializable{
 	private String content;
 	private boolean seen;
 	
+	private boolean hasReport;
+	private Report report;
+	
 	public Message(String senderId, String receiverId, String content) {
 		super();
 		this.senderId = senderId;
 		this.receiverId = receiverId;
 		this.content = content;
 		this.seen = false;
+		this.hasReport = false;
+		this.report = null;
 	}
 	
+	public Message(String senderId, String receiverId, String content, boolean hasReport, Report report) {
+		super();
+		this.senderId = senderId;
+		this.receiverId = receiverId;
+		this.content = content;
+		this.seen = false;
+		this.hasReport = hasReport;
+		this.report = report;
+	}
+
 	public String getSenderId() {
 		return senderId;
 	}
@@ -50,6 +65,20 @@ public class Message implements Serializable{
 		this.seen = seen;
 	}
 
-	
+	public boolean isHasReport() {
+		return hasReport;
+	}
+
+	public void setHasReport(boolean hasReport) {
+		this.hasReport = hasReport;
+	}
+
+	public Report getReport() {
+		return report;
+	}
+
+	public void setReport(Report report) {
+		this.report = report;
+	}
 
 }

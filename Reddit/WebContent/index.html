@@ -53,7 +53,7 @@
 							<span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
 							<li><a href="" data-toggle="modal" data-target="#profilePage">Profile</a></li>
-							<li><a href="" data-toggle="modal" data-target="#showInbox">Inbox&nbsp;<span class="badge">0</span></a></li>
+							<li><a href="" data-toggle="modal" data-target="#showInbox">Inbox&nbsp;<span id="receivedMessagesBadge" class="badge">0</span></a></li>
 							<li class="divider"></li>
 							<li><a id="logout" href="#">Logout</a>
 							</li>
@@ -100,9 +100,9 @@
 				<div class="well">
 					<h4>Search</h4>
 					<div class="input-group">
-						<input type="text" class="form-control">
+						<input id="searchQuery" type="text" class="form-control">
 						<span class="input-group-btn">
-                            <button class="btn btn-default" type="button">
+                            <button id="searchPressed" class="btn btn-default" type="button">
                                 <span class="glyphicon glyphicon-search"></span>
 						</button>
 						</span>
@@ -145,429 +145,460 @@
 			</div>
 		</footer>
 
-	</div>
 
-	<!--Modals-->
 
-	<!--Login/Registration-->
-	<div id="loginUser" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Log in</h4>
-				</div>
-				<div class="modal-body">
-					<form id="loginForm" class="form-horizontal" action="/reddit-clone/rest/user/login" method="POST" role="form">
-						<div class="form-group">
-							<label for="username" class="col-sm-2 control-label">Username</label>
-							<div class="col-sm-10">
-								<input name="username" type="text" class="form-control" id="username" placeholder="Enter username">
+		<!--Modals-->
+
+		<!--Login/Registration-->
+		<div id="loginUser" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Log in</h4>
+					</div>
+					<div class="modal-body">
+						<form id="loginForm" class="form-horizontal" action="/reddit-clone/rest/user/login" method="POST" role="form">
+							<div class="form-group">
+								<label for="username" class="col-sm-2 control-label">Username</label>
+								<div class="col-sm-10">
+									<input name="username" type="text" class="form-control" id="username" placeholder="Enter username">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="password" class="col-sm-2 control-label">Password</label>
-							<div class="col-sm-10">
-								<input name="password" type="password" id="password" class="form-control" name="password" placeholder="Enter password">
+							<div class="form-group">
+								<label for="password" class="col-sm-2 control-label">Password</label>
+								<div class="col-sm-10">
+									<input name="password" type="password" id="password" class="form-control" name="password" placeholder="Enter password">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Log in</button>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Log in</button>
+								</div>
 							</div>
-						</div>
-					</form>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div id="registerUser" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Register user</h4>
-				</div>
-				<div class="modal-body">
-					<form id="registerForm" class="form-horizontal" action="/reddit-clone/rest/user/register" method="POST" role="form">
-						<div class="form-group">
-							<label for="username" class="col-sm-2 control-label">Username</label>
-							<div class="col-sm-10">
-								<input name="username" type="text" class="form-control" id="username" placeholder="Enter username">
+		<div id="registerUser" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Register user</h4>
+					</div>
+					<div class="modal-body">
+						<form id="registerForm" class="form-horizontal" action="/reddit-clone/rest/user/register" method="POST" role="form">
+							<div class="form-group">
+								<label for="username" class="col-sm-2 control-label">Username</label>
+								<div class="col-sm-10">
+									<input name="username" type="text" class="form-control" id="username" placeholder="Enter username">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="password" class="col-sm-2 control-label">Password</label>
-							<div class="col-sm-10">
-								<input name="password" type="password" class="form-control" id="password" placeholder="Enter password">
+							<div class="form-group">
+								<label for="password" class="col-sm-2 control-label">Password</label>
+								<div class="col-sm-10">
+									<input name="password" type="password" class="form-control" id="password" placeholder="Enter password">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="email" class="col-sm-2 control-label">Email</label>
-							<div class="col-sm-10">
-								<input name="email" type="text" class="form-control" id="email" placeholder="Enter email">
+							<div class="form-group">
+								<label for="email" class="col-sm-2 control-label">Email</label>
+								<div class="col-sm-10">
+									<input name="email" type="text" class="form-control" id="email" placeholder="Enter email">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="name" placeholder="Enter name">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input name="name" type="text" class="form-control" id="name" placeholder="Enter name">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="surname" class="col-sm-2 control-label">Surname</label>
-							<div class="col-sm-10">
-								<input name="surname" type="text" class="form-control" id="surname" placeholder="Enter surname">
+							<div class="form-group">
+								<label for="surname" class="col-sm-2 control-label">Surname</label>
+								<div class="col-sm-10">
+									<input name="surname" type="text" class="form-control" id="surname" placeholder="Enter surname">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="phone" class="col-sm-2 control-label">Phone</label>
-							<div class="col-sm-10">
-								<input name="phoneNumber" type="text" class="form-control" id="phone" placeholder="Enter phone number">
+							<div class="form-group">
+								<label for="phone" class="col-sm-2 control-label">Phone</label>
+								<div class="col-sm-10">
+									<input name="phoneNumber" type="text" class="form-control" id="phone" placeholder="Enter phone number">
+								</div>
 							</div>
-						</div>
 
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Register</button>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Register</button>
+								</div>
 							</div>
-						</div>
-					</form>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<!--Topics management-->
-	<div id="addTopic" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Add topic</h4>
-				</div>
-				<div class="modal-body">
-					<form id="addTopicForm" class="form-horizontal" action="" method="POST" role="form">
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-10">
-								<input name="topicId" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
+		<!--Topics management-->
+		<div id="addTopic" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Add topic</h4>
+					</div>
+					<div class="modal-body">
+						<form id="addTopicForm" class="form-horizontal" action="" method="POST" role="form">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input name="topicId" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Type</label>
-							<div class="col-sm-10">
-								<select name="type" id="AddTopicInputType">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Type</label>
+								<div class="col-sm-10">
+									<select name="type" id="AddTopicInputType">
 									<option value="text">Text</option>
 									<option value="link">Link</option>
 									<option value="image">Image</option>
 								</select>
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="content" class="col-sm-2 control-label">Content</label>
-							<div class="col-sm-10">
-								<textarea name="content" id="AddTopicInputContent" class="form-control" placeholder="Enter message" rows="5"></textarea>
+							<div class="form-group">
+								<label for="content" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-10">
+									<textarea name="content" id="AddTopicInputContent" class="form-control" placeholder="Enter message" rows="5"></textarea>
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button id="addTopicSubmitButton" class="btn btn-primary text-right">Add topic</button>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button id="addTopicSubmitButton" class="btn btn-primary text-right">Add topic</button>
+								</div>
 							</div>
-						</div>
-					</form>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div id="editTopic" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Edit topic</h4>
-				</div>
-				<div class="modal-body">
-					<form id="editTopicForm" class="form-horizontal" action="" method="POST" role="form">
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="EditTopicInputName" placeholder="Enter topic name">
+		<div id="editTopic" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Edit topic</h4>
+					</div>
+					<div class="modal-body">
+						<form id="editTopicForm" class="form-horizontal" action="" method="POST" role="form">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input name="name" type="text" class="form-control" id="EditTopicInputName" placeholder="Enter topic name">
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Type</label>
-							<div class="col-sm-10">
-								<select name="type" id="EditTopicInputType">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Type</label>
+								<div class="col-sm-10">
+									<select name="type" id="EditTopicInputType">
 									<option value="text">Text</option>
 									<option value="link">Link</option>
 									<option value="image">Image</option>
 								</select>
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="content" class="col-sm-2 control-label">Content</label>
-							<div class="col-sm-10">
-								<textarea name="content" id="EditTopicInputContent" class="form-control" placeholder="Enter topic content" rows="5"></textarea>
+							<div class="form-group">
+								<label for="content" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-10">
+									<textarea name="content" id="EditTopicInputContent" class="form-control" placeholder="Enter topic content" rows="5"></textarea>
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button id="editTopicSubmitButton" class="btn btn-primary text-right">Save</button>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button id="editTopicSubmitButton" class="btn btn-primary text-right">Save</button>
+								</div>
 							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="showTopic" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<div id="topicNameModal">
-						<h4 class="modal-title">Topic</h4>
-					</div>
-				</div>
-				<div class="modal-body" id="topicContentModal">
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="reportTopic" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Report topic</h4>
-				</div>
-				<div class="modal-body">
-					<form id="reportTopicForm" class="form-horizontal" action="http://localhost:8080/reddit-clone/rest/topic/report" method="POST" role="form">
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Subforum</label>
-							<div class="col-sm-10">
-								<input name="subforumId" type="text" class="form-control" id="reportSubforumIdInputName" placeholder="Enter subforum name" readonly>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Topic</label>
-							<div class="col-sm-10">
-								<input name="topicId" type="text" class="form-control" id="reportTopicIdInputName" placeholder="Enter topic name" readonly>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="content" class="col-sm-2 control-label">Content</label>
-							<div class="col-sm-10">
-								<textarea name="complaintText" id="reportInputComplaintText" class="form-control" placeholder="Enter complaint text" rows="5"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" id="reportTopicSubmitButton" class="btn btn-primary text-right">Add topic</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!--Subforum management-->
-	<div id="addSubforum" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Add subforum</h4>
-				</div>
-				<div class="modal-body">
-					<form id="addSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/create" method="POST" role="form">
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="name" placeholder="Enter subforum name">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="description" class="col-sm-2 control-label">Description</label>
-							<div class="col-sm-10">
-								<input name="description" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="rules" class="col-sm-2 control-label">Rules</label>
-							<div class="col-sm-10">
-								<textarea name="rules" id="rules" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Add subforum</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="editSubforum" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Edit subforum</h4>
-				</div>
-				<div class="modal-body">
-					<form id="editSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/update" method="POST" role="form">
-						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-10">
-								<input name="name" type="text" class="form-control" id="EditSubforumFormName" placeholder="Enter subforum name" readonly>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="description" class="col-sm-2 control-label">Description</label>
-							<div class="col-sm-10">
-								<input name="description" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="rules" class="col-sm-2 control-label">Rules</label>
-							<div class="col-sm-10">
-								<textarea name="rules" id="rules" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Edit subforum</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="showSubforums" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Subforums</h4>
-				</div>
-				<div class="modal-body" id="subforumsLinks">
-				</div>
-			</div>
-
-		</div>
-	</div>
-
-	<!--Subforum messaging-->
-	<div id="showInbox" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Inbox</h4>
-				</div>
-				<div class="modal-body" id="messages">
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="sendMessage" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Send message</h4>
-				</div>
-				<div class="modal-body">
-					<form id="sendMessageForm" class="form-horizontal" action="/reddit-clone/rest/index/message" method="POST" role="form">
-						<div class="form-group">
-							<label for="receiver" class="col-sm-2 control-label">Receiver</label>
-							<div class="col-sm-10">
-								<input name="receiver" type="text" class="form-control" id="receiver" placeholder="Enter receiver's username">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="content" class="col-sm-2 control-label">Content</label>
-							<div class="col-sm-10">
-								<textarea name="content" id="content" class="form-control" placeholder="Enter message" rows="5"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<button type="submit" class="btn btn-primary text-right">Send message</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-
-		</div>
-	</div>
-
-	<!--Profile-->
-	<div id="profilePage" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Profile</h4>
-				</div>
-				<div class="modal-body" id="profile">
-					<h4>Saved topics: </h4>
-					<div id="profileSavedTopic">
-						
-					</div>
-					
-					<h4>Saved comments: </h4>
-					<div id="profileSavedComments">
-
-					</div>
-
-					<h4>Likes: </h4>
-					<div id="profileLikes">
-						
-					</div>
-
-					<h4>Dislikes: </h4>
-					<div id="profileDislikes">
-						
-					</div>
-					<h4>Followed subforums: </h4>
-					<div id="profileFollowedSubforums">
-						
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-
-	<!--Users management-->
-	<div id="usersManagement" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Users</h4>
+		<div id="showTopic" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<div id="topicNameModal">
+							<h4 class="modal-title">Topic</h4>
+						</div>
+					</div>
+					<div class="modal-body" id="topicContentModal">
+					</div>
 				</div>
-				<div class="modal-body" id="profile">
-					<table id="users" border="1">
-						<tr>
-							<td>Username</td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-					</table>
+			</div>
+		</div>
+		<div id="reportTopic" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Report topic</h4>
+					</div>
+					<div class="modal-body">
+						<form id="reportTopicForm" class="form-horizontal" action="http://localhost:8080/reddit-clone/rest/topic/report" method="POST"
+						 role="form">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Subforum</label>
+								<div class="col-sm-10">
+									<input name="subforumId" type="text" class="form-control" id="reportSubforumIdInputName" placeholder="Enter subforum name"
+									 readonly>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Topic</label>
+								<div class="col-sm-10">
+									<input name="topicId" type="text" class="form-control" id="reportTopicIdInputName" placeholder="Enter topic name" readonly>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="content" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-10">
+									<textarea name="complaintText" id="reportInputComplaintText" class="form-control" placeholder="Enter complaint text" rows="5"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" id="reportTopicSubmitButton" class="btn btn-primary text-right">Add topic</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--Subforum management-->
+		<div id="addSubforum" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Add subforum</h4>
+					</div>
+					<div class="modal-body">
+						<form id="addSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/create" method="POST" role="form">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input name="name" type="text" class="form-control" id="name" placeholder="Enter subforum name">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="description" class="col-sm-2 control-label">Description</label>
+								<div class="col-sm-10">
+									<input name="description" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="rules" class="col-sm-2 control-label">Rules</label>
+								<div class="col-sm-10">
+									<textarea name="rules" id="rules" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Add subforum</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="editSubforum" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Edit subforum</h4>
+					</div>
+					<div class="modal-body">
+						<form id="editSubforumForm" class="form-horizontal" action="/reddit-clone/rest/subforum/update" method="POST" role="form">
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input name="name" type="text" class="form-control" id="EditSubforumFormName" placeholder="Enter subforum name" readonly>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="description" class="col-sm-2 control-label">Description</label>
+								<div class="col-sm-10">
+									<input name="description" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="rules" class="col-sm-2 control-label">Rules</label>
+								<div class="col-sm-10">
+									<textarea name="rules" id="rules" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Edit subforum</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="showSubforums" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Subforums</h4>
+					</div>
+					<div class="modal-body" id="subforumsLinks">
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!--Subforum messaging-->
+		<div id="showInbox" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Inbox</h4>
+					</div>
+					<div class="modal-body" id="messages">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="sendMessage" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Send message</h4>
+					</div>
+					<div class="modal-body">
+						<form id="sendMessageForm" class="form-horizontal" action="/reddit-clone/rest/index/message" method="POST" role="form">
+							<div class="form-group">
+								<label for="receiver" class="col-sm-2 control-label">Receiver</label>
+								<div class="col-sm-10">
+									<input name="receiver" type="text" class="form-control" id="receiver" placeholder="Enter receiver's username">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="content" class="col-sm-2 control-label">Content</label>
+								<div class="col-sm-10">
+									<textarea name="content" id="content" class="form-control" placeholder="Enter message" rows="5"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Send message</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!--Profile-->
+		<div id="profilePage" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Profile</h4>
+					</div>
+					<div class="modal-body" id="profile">
+						<h4>Saved topics: </h4>
+						<div id="profileSavedTopic">
+
+						</div>
+
+						<h4>Saved comments: </h4>
+						<div id="profileSavedComments">
+
+						</div>
+
+						<h4>Likes: </h4>
+						<div id="profileLikes">
+
+						</div>
+
+						<h4>Dislikes: </h4>
+						<div id="profileDislikes">
+
+						</div>
+						<h4>Followed subforums: </h4>
+						<div id="profileFollowedSubforums">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--Search result-->
+		<div id="searchResultPage" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="profile">
+						<h4>Subforums: </h4>
+						<div id="SubforumsSearchResults">
+
+						</div>
+
+						<h4>Topics: </h4>
+						<div id="TopicsSearchResults">
+
+						</div>
+
+						<h4>Users: </h4>
+						<div id="UsersSearchResults">
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--Users management-->
+		<div id="usersManagement" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Users</h4>
+					</div>
+					<div class="modal-body" id="profile">
+						<table id="users" border="1">
+							<tr>
+								<td>Username</td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
 </body>
 
 </html>

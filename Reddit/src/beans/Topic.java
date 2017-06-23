@@ -9,7 +9,7 @@ import java.util.List;
 public class Topic implements Serializable {
 
 	private String name;
-	private User author;
+	private String author;
 	private String content;
 	private String type;
 	private String creationDate;
@@ -20,7 +20,7 @@ public class Topic implements Serializable {
 	
 	private List<Comment> comments;
 
-	public Topic(String name, String content, User author, String parentSubforumName) {
+	public Topic(String name, String content, String author, String parentSubforumName) {
 		super();
 		this.name = name;
 		this.author = author;
@@ -41,11 +41,11 @@ public class Topic implements Serializable {
 		this.name = name;
 	}
 
-	public User getAuthor() {
+	public String getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(User author) {
+	public void setAuthor(String author) {
 		this.author = author;
 	}
 

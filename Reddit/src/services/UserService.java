@@ -139,6 +139,23 @@ public class UserService {
 	}
 	
 	@GET
+	@Path("/seen/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String seen(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			user.getMessages().get(messageId).setSeen(true);
+			return "Message seen!";
+		}
+		else {
+			return null;
+		}
+	}
+	
+	@GET
 	@Path("/logout")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String logout() {

@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 
 import beans.Comment;
 import beans.Message;
+import beans.Report;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
@@ -43,7 +44,7 @@ public class TopicService {
 		
 		if(user != null) {
 
-			Topic topic = new Topic(topicId, content, user, subforumId);
+			Topic topic = new Topic(topicId, content, user.getUsername(), subforumId);
 			topic.setType(type);
 			
 			dao.addTopic(subforumId, topic);
@@ -284,11 +285,17 @@ public class TopicService {
 			Topic topic = dao.searchTopics(subforumId, topicId);
 			
 			if(topic != null && subforum != null) {
-				// TODO real implementation
-				User moderator = subforum.getResponsibleModerator();
-				moderator.addMessage(new Message(user.getName(), subforum.getResponsibleModerator().getName(), complaintText));
+				
+				Report report =  new Report(complaintText, topic, user.getUsername());
+				
+				User moderator = dao.searchUser(subforum.getResponsibleModerator().getUsername());
+				
+				moderator.addMessage(new Message(user.getUsername(), 
+												moderator.getUsername(), 
+												complaintText, true, report));
+				
 				dao.saveDatabase();
-				return "Reported" + topic.getName();
+				return "Reported " + topic.getName();
 			}
 			else {
 				return "Failed to report";
@@ -296,6 +303,40 @@ public class TopicService {
 		}
 		else {
 			return "Must be logged to report topic!";
+		}
+	}
+	
+	@GET
+	@Path("/report/delete/{messageId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String deleteReport(@PathParam("messageId") int messageId) {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			
+			Message message = user.getMessages().get(messageId);
+			
+			Report report = message.getReport();
+			
+			User reportAuthor = dao.searchUser(report.getUserId());
+			
+			String entityAuthorId = report.getEnitityOfComplaint().getAuthor();
+			User entityAuthor = dao.searchUser(entityAuthorId);
+			
+			reportAuthor.addMessage(new Message(user.getUsername(), 
+												reportAuthor.getUsername(), 
+												"Thank you for report! Reported topic will be deleted."));
+			
+			entityAuthor.addMessage(new Message(user.getUsername(), 
+					entityAuthor.getUsername(), 
+					"The topic " + report.getEnitityOfComplaint().getName() + " has been reported for violating rules.You have 24h to delete it."));
+			
+			return "Report author and topic author has beed notified.";
+		}
+		else {
+			return "Must be logged to delete report !";
 		}
 	}
 	

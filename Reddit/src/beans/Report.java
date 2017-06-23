@@ -7,15 +7,15 @@ public class Report implements Serializable {
 
 	private String text;
 	private String date;
-	private int enitityOfComplaint;
-	private User user;
+	private Topic enitityOfComplaint;
+	private String userId;
 
-	public Report(String text, String date, int enitityOfComplaint, User user) {
+	public Report(String text, Topic enitityOfComplaint, String userId) {
 		super();
 		this.text = text;
-		this.date = date;
+		this.date = null;
 		this.enitityOfComplaint = enitityOfComplaint;
-		this.user = user;
+		this.userId = userId;
 	}
 
 	public String getText() {
@@ -34,20 +34,20 @@ public class Report implements Serializable {
 		this.date = date;
 	}
 
-	public int getEnitityOfComplaint() {
+	public Topic getEnitityOfComplaint() {
 		return enitityOfComplaint;
 	}
 
-	public void setEnitityOfComplaint(int enitityOfComplaint) {
+	public void setEnitityOfComplaint(Topic enitityOfComplaint) {
 		this.enitityOfComplaint = enitityOfComplaint;
 	}
 
-	public User getUser() {
-		return user;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	
+
 }
