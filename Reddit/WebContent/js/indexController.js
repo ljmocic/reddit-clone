@@ -493,22 +493,22 @@ function loadSubforum(subforumId, followedForumsMode) {
         topics.forEach(function (topic) {
             var tableRow = '<tr>' +
                 '<td>' +
-                '<table border="1">' +
+                '<table>' +
                 '<tbody>' +
                 '<tr>' +
-                '<td><a href="#" class="likeTopic">Like</a></td>' +
-                '<td><a href="#" class="topicId">' + topic.name + '</a></td>' +
-                '<td><a href="#" class="saveTopic">Save</a></td>' +
+                '<td class="likeTopicRow"><a href="#" class="likeTopic">Like</a></td>' +
+                '<td class="topicIdRow"><a href="#" class="topicId">' + topic.name + '</a></td>' +
+                '<td class="saveTopicRow"><a href="#" class="saveTopic">Save</a></td>' +
                 '</tr>' +
                 '<tr>' +
-                '<td>' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
-                '<td>submitted by ' + topic.author + '</td>' +
-                '<td><a href="#" class="deleteTopic">Delete</a><a href="#" class="editTopic">Edit</a></td>' +
+                '<td class="likesCount">' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
+                '<td class="submittedBy">submitted by ' + topic.author + '</td>' +
+                '<td><a href="#" class="deleteTopic">Delete</a>&nbsp;<a href="#" class="editTopic">Edit</a></td>' +
                 '</tr>' +
                 '<tr>' +
-                '<td><a href="#" class="dislikeTopic">Dislike</a></td>' +
-                '<td>' + topic.comments.length + ' comments</td>' +
-                '<td><a href="#" class="reportTopic">Report</a></td>' +
+                '<td class="dislikeTopicRow"><a href="#" class="dislikeTopic">Dislike</a></td>' +
+                '<td class="commentsCount">' + topic.comments.length + ' comments</td>' +
+                '<td class="reportTopicRow"><a href="#" class="reportTopic">Report</a></td>' +
                 '</tr>' +
                 '</tbody>' +
                 '</table>' +
