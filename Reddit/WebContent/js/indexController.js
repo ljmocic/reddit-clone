@@ -40,7 +40,7 @@ $(document).ready(function () {
     $('#' + addSubforumFormId).submit(function (e) {
         handleForm(e, addSubforumFormId);
     });
-
+    
     var editSubforumFormId = 'editSubforumForm';
     $('#' + editSubforumFormId).submit(function (e) {
         handleForm(e, editSubforumFormId);
@@ -86,11 +86,19 @@ $(document).ready(function () {
         deleteSubforum();
     });
 
+    $('input:file').change(function(e){
+        uploadFile();
+    });
+
     $('#logout').click(function () {
         logoutUser();
     });
 
 });
+
+function uploadFile() {
+    alert("To do upload!");
+}
 
 function followSubforum() {
     var subforumId = $('#subforumNameH3').text();

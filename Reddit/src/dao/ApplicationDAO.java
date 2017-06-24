@@ -44,7 +44,7 @@ public class ApplicationDAO {
 		return instance;
 	}
 	
-	public void saveDatabase() {
+	public synchronized void saveDatabase() {
 		ObjectOutputStream out = null;
 		try {
 			out = new ObjectOutputStream(
@@ -64,7 +64,7 @@ public class ApplicationDAO {
 		}
 	}
 	
-	public void loadDatabase() {
+	public synchronized void loadDatabase() {
 		ObjectInputStream in = null;
 		try {
 			in = new ObjectInputStream(
@@ -84,28 +84,28 @@ public class ApplicationDAO {
 		}
 	}
 	
-	public List<Subforum> getSubforums() {
+	public synchronized List<Subforum> getSubforums() {
 		return application.getSubforums();
 	}
 
-	public void setSubforums(List<Subforum> subforums) {
+	public synchronized void setSubforums(List<Subforum> subforums) {
 		this.application.setSubforums(subforums);
 	}
 	
-	public List<User> getUsers() {
+	public synchronized List<User> getUsers() {
 		return this.application.getUsers();
 	}
 
-	public void setUsers(List<User> users) {
+	public synchronized void setUsers(List<User> users) {
 		this.application.setUsers(users);
 	}
 
-	public void addUser(User user) {
+	public synchronized void addUser(User user) {
 		application.getUsers().add(user);
 		saveDatabase();
 	}
 	
-	public User searchUser(String username) {
+	public synchronized User searchUser(String username) {
 		for(User user: application.getUsers()) {
 			if(user.getUsername().equals(username)) {
 				return user;
@@ -114,7 +114,7 @@ public class ApplicationDAO {
 		return null;
 	}
 
-	public Subforum searchSubforums(String id) {
+	public synchronized Subforum searchSubforums(String id) {
 		
 		for(Subforum subforum: application.getSubforums()) {
 			if(subforum.getName().equals(id)) {
@@ -124,7 +124,7 @@ public class ApplicationDAO {
 		return null;
 	}
 
-	public Topic searchTopics(String subforumId, String topicId) {
+	public synchronized Topic searchTopics(String subforumId, String topicId) {
 		
 		Subforum subforum = searchSubforums(subforumId);
 		List<Topic> topics = subforum.getTopics();
@@ -137,7 +137,7 @@ public class ApplicationDAO {
 		return null;
 	}
 	
-	public Comment searchComments(String subforumId, String topicId, String commentId) {
+	public synchronized Comment searchComments(String subforumId, String topicId, String commentId) {
 		Topic topic = searchTopics(subforumId, topicId);
 		
 		for(Comment comment: topic.getComments()) {
@@ -148,12 +148,12 @@ public class ApplicationDAO {
 		return null;
 	}
 
-	public void addSubforum(Subforum subforum) {
+	public synchronized void addSubforum(Subforum subforum) {
 		application.getSubforums().add(subforum);
 		saveDatabase();
 	}
 
-	public void deleteSubforum(String name) {
+	public synchronized void deleteSubforum(String name) {
 		for(Subforum subforum: application.getSubforums()) {
 			if(subforum.getName().equals(name)) {
 				application.getSubforums().remove(subforum);
@@ -163,7 +163,7 @@ public class ApplicationDAO {
 		}
 	}
 
-	public void addTopic(String subforumId, Topic topic) {
+	public synchronized void addTopic(String subforumId, Topic topic) {
 		Subforum subforum = searchSubforums(subforumId);
 		
 		if(subforum != null) {
@@ -172,7 +172,7 @@ public class ApplicationDAO {
 		}
 	}
 
-	public void changeUserRole(String username, String role) {
+	public synchronized void changeUserRole(String username, String role) {
 		for(User user: application.getUsers()) {
 			if(user.getUsername().equals(username)) {
 				user.setRole(role);
@@ -182,13 +182,13 @@ public class ApplicationDAO {
 		}
 	}
 
-	public void deleteTopic(String subforumId, Topic topic) {
+	public synchronized void deleteTopic(String subforumId, Topic topic) {
 		Subforum subforum = searchSubforums(subforumId);
 		subforum.getTopics().remove(topic);
 		saveDatabase();
 	}
 
-	public void sendMessageToAdministrators(Message message) {
+	public synchronized void sendMessageToAdministrators(Message message) {
 		for(User user: application.getUsers()) {
 			Message copyMessage = new Message(message);
 			if(user.getRole().equals(Config.ADMIN)) {
