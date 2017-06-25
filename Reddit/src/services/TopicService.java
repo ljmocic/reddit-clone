@@ -332,7 +332,9 @@ public class TopicService {
 			
 			entityAuthor.addMessage(new Message(user.getUsername(), 
 					entityAuthor.getUsername(), 
-					"The topic " + report.getTopic().getName() + " has been reported for violating rules.You have 24h to delete it."));
+					"The topic " + report.getTopic().getName() + " has been reported for violating rules. It will be immediately deleted!"));
+			
+			dao.deleteTopic(report.getTopic().getParentSubforumName(), report.getTopic());
 			
 			return "Report author and topic author has beed notified.";
 		}

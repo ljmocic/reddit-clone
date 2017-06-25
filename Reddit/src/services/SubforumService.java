@@ -245,7 +245,9 @@ public class SubforumService {
 			"Thank you for report! Reported subforum will be deleted."));
 			
 			admin.addMessage(new Message(user.getUsername(), admin.getUsername(),
-			"Warning, the subforum " + report.getSubforum().getName() + " has been reported for violating rules. You have 24 to delete it!"));
+			"Warning, the subforum " + report.getSubforum().getName() + " has been reported for violating rules. It will be immediately deleted!"));
+			
+			dao.deleteSubforum(report.getSubforum().getName());
 			
 			return "Report author and topic author has beed notified.";
 		}

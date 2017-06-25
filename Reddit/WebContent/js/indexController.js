@@ -9,12 +9,12 @@ $(document).ready(function () {
     checkLoggedInStatus();
 
     loadFollowedSubforum();
+    
+    loadProfileDetails();
 
     loadSubforumLinks();
 
     loadUserList();
-
-    loadProfileDetails();
 
     loadMessages();
 
@@ -408,7 +408,7 @@ function loadProfileDetails() {
 
         $('#profileSavedTopic').empty();
         user.savedTopics.forEach(function (savedTopic) {
-            $('#profileSavedTopic').append('<p>' + savedTopic.name + '</p>');
+            $('#profileSavedTopic').append('<p><a href="#" class="topicId' + savedTopic.parentSubforumName + '">' + savedTopic.name + '</a></p>');
         });
 
         $('#profileSavedComments').empty();
@@ -418,17 +418,22 @@ function loadProfileDetails() {
 
         $('#profileLikes').empty();
         user.likedTopics.forEach(function (likedTopic) {
-            $('#profileLikes').append('<p>' + likedTopic.name + '</p>');
+            $('#profileLikes').append('<p><a href="#" class="topicId' + likedTopic.parentSubforumName + '">' + likedTopic.name + '</a></p>');
         });
 
         $('#profileDislikes').empty();
         user.dislikedTopics.forEach(function (dislikedTopic) {
-            $('#profileDislikes').append('<p>' + dislikedTopic.name + '</p>');
+            $('#profileDislikes').append('<p><a href="#" class="topicId' + dislikedTopic.parentSubforumName + '">' + dislikedTopic.name + '</a></p>');
         });
 
         $('#profileFollowedSubforums').empty();
         user.followedSubforums.forEach(function (subforum) {
-            $('#profileFollowedSubforums').append('<p>' + subforum + '</p>');
+            $('#profileFollowedSubforums').append('<p><a href="#" id="' + subforum + '" class="profileSubforumLink">' + subforum + '</a></p>');
+        });
+        $('.profileSubforumLink').click(function() {
+            var clickedButtonId = $(this).attr('id');
+            $('.modal').modal('hide');
+            loadSubforum(clickedButtonId);
         });
 
     });
@@ -444,7 +449,13 @@ function performSearch() {
         
         $('#SubforumsSearchResults').empty();
         subforums.forEach(function (subforum) {
-            $('#SubforumsSearchResults').append('<p>' + subforum.name + '</p>');
+            $('#SubforumsSearchResults').append('<p><a href="#" id="' + subforum.name + '" class="searchSubforumLink">' + subforum.name + '</a></p>');
+        });
+
+        $('.searchSubforumLink').click(function() {
+            var clickedButtonId = $(this).attr('id');
+            $('.modal').modal('hide');
+            loadSubforum(clickedButtonId);
         });
 
     });
@@ -455,7 +466,7 @@ function performSearch() {
         
         $('#TopicsSearchResults').empty();
         topics.forEach(function (topic) {
-            $('#TopicsSearchResults').append('<p>' + topic.name + '</p>');
+            $('#TopicsSearchResults').append('<p><a href="#" class="topicId' + topic.parentSubforumName + '">' + topic.name + '</a></p>');
         });
 
     });
@@ -504,19 +515,19 @@ function loadSubforum(subforumId, followedForumsMode) {
                 '<table>' +
                 '<tbody>' +
                 '<tr>' +
-                '<td class="likeTopicRow"><a href="#" class="likeTopic">Like</a></td>' +
-                '<td class="topicIdRow"><a href="#" class="topicId">' + topic.name + '</a></td>' +
-                '<td class="saveTopicRow"><a href="#" class="saveTopic">Save</a></td>' +
+                '<td class="likeTopicRow"><a href="#" class="likeTopic' + topics[0].parentSubforumName + '">Like</a></td>' +
+                '<td class="topicIdRow"><a href="#" class="topicId' + topics[0].parentSubforumName + '">' + topic.name + '</a></td>' +
+                '<td class="saveTopicRow"><a href="#" class="saveTopic' + topics[0].parentSubforumName + '">Save</a></td>' +
                 '</tr>' +
                 '<tr>' +
                 '<td class="likesCount">' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
                 '<td class="submittedBy">submitted by ' + topic.author + '</td>' +
-                '<td><a href="#" class="deleteTopic">Delete</a>&nbsp;<a href="#" class="editTopic">Edit</a></td>' +
+                '<td><a href="#" class="deleteTopic' + topics[0].parentSubforumName + '">Delete</a>&nbsp;<a href="#" class="editTopic' + topics[0].parentSubforumName + '">Edit</a></td>' +
                 '</tr>' +
                 '<tr>' +
-                '<td class="dislikeTopicRow"><a href="#" class="dislikeTopic">Dislike</a></td>' +
+                '<td class="dislikeTopicRow"><a href="#" class="dislikeTopic' + topics[0].parentSubforumName + '">Dislike</a></td>' +
                 '<td class="commentsCount">' + topic.comments.length + ' comments</td>' +
-                '<td class="reportTopicRow"><a href="#" class="reportTopic">Report</a></td>' +
+                '<td class="reportTopicRow"><a href="#" class="reportTopic' + topics[0].parentSubforumName + '">Report</a></td>' +
                 '</tr>' +
                 '</tbody>' +
                 '</table>' +
@@ -526,18 +537,20 @@ function loadSubforum(subforumId, followedForumsMode) {
             $('#topics').append(tableRow);
         });
 
-        $('.topicId').click(function () {
+        //$('.topicId').unbind('click');
+        $('.topicId' + topics[0].parentSubforumName).click(function () {
             var clickedTopic = $(this).text();
 
             $.ajax({
                 url: baseUrl + '/subforum/load/' + topics[0].parentSubforumName + '/' + clickedTopic + ''
             }).then(function (topic) {
 
+                $('.modal').modal('hide');
+
                 $('#topicNameModal').empty();
                 $('#topicContentModal').empty();
 
                 $('#topicNameModal').append('<h4 class="modal-title">' + topic.name + '</h4>');
-                //alert(topic.type);
 
                 if (topic.type == "text") {
                     $('#topicContentModal').append('<div>' + topic.content + '</div>');
@@ -555,8 +568,8 @@ function loadSubforum(subforumId, followedForumsMode) {
 
         });
 
-        $('.likeTopic').click(function () {
-            var clickedTopicId = $(this).closest('table').find('.topicId').text();
+        $('.likeTopic' + topics[0].parentSubforumName).click(function () {
+            var clickedTopicId = $(this).closest('table').find('.topicId' + topics[0].parentSubforumName).text();
 
             $.ajax({
                 url: baseUrl + '/topic/like/' + topics[0].parentSubforumName + '/' + clickedTopicId
@@ -567,8 +580,8 @@ function loadSubforum(subforumId, followedForumsMode) {
 
         });
 
-        $('.dislikeTopic').click(function () {
-            var clickedTopicId = $(this).closest('table').find('.topicId').text();
+        $('.dislikeTopic' + topics[0].parentSubforumName).click(function () {
+            var clickedTopicId = $(this).closest('table').find('.topicId' + topics[0].parentSubforumName).text();
 
             $.ajax({
                 url: baseUrl + '/topic/dislike/' + topics[0].parentSubforumName + '/' + clickedTopicId
@@ -579,8 +592,8 @@ function loadSubforum(subforumId, followedForumsMode) {
 
         });
 
-        $('.saveTopic').click(function () {
-            var clickedTopicId = $(this).closest('table').find('.topicId').text();
+        $('.saveTopic' + topics[0].parentSubforumName).click(function () {
+            var clickedTopicId = $(this).closest('table').find('.topicId' + topics[0].parentSubforumName).text();
 
             $.ajax({
                 url: baseUrl + '/topic/saveTopic/' + topics[0].parentSubforumName + '/' + clickedTopicId
@@ -591,8 +604,8 @@ function loadSubforum(subforumId, followedForumsMode) {
 
         });
 
-        $('.reportTopic').click(function () {
-            var clickedTopicId = $(this).closest('table').find('.topicId').text();
+        $('.reportTopic' + topics[0].parentSubforumName).click(function () {
+            var clickedTopicId = $(this).closest('table').find('.topicId' + topics[0].parentSubforumName).text();
 
             $('#reportSubforumIdInputName').val(topics[0].parentSubforumName);
             $('#reportTopicIdInputName').val(clickedTopicId);
@@ -600,8 +613,8 @@ function loadSubforum(subforumId, followedForumsMode) {
             $('#reportTopic').modal('show');
         });
 
-        $('.deleteTopic').click(function () {
-            var clickedTopicId = $(this).closest('table').find('.topicId').text();
+        $('.deleteTopic' + topics[0].parentSubforumName).click(function () {
+            var clickedTopicId = $(this).closest('table').find('.topicId' + topics[0].parentSubforumName).text();
 
             $.ajax({
                 url: baseUrl + '/topic/delete/' + topics[0].parentSubforumName + '/' + clickedTopicId
@@ -613,8 +626,8 @@ function loadSubforum(subforumId, followedForumsMode) {
 
         });
 
-        $('.editTopic').click(function () {
-            var clickedTopicId = $(this).closest('table').find('.topicId').text();
+        $('.editTopic' + topics[0].parentSubforumName).click(function () {
+            var clickedTopicId = $(this).closest('table').find('.topicId' + topics[0].parentSubforumName).text();
             
             topics.forEach(function (topic) {
                 if(topic.name == clickedTopicId) {
