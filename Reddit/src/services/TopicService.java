@@ -44,12 +44,23 @@ public class TopicService {
 		
 		if(user != null) {
 
-			Topic topic = new Topic(topicId, content, user.getUsername(), subforumId);
-			topic.setType(type);
-			
-			dao.addTopic(subforumId, topic);
-			
-			return "Added a topic" + topic.toString();
+			if(dao.searchTopics(subforumId, topicId) == null) {
+				if(!(topicId.equals("") || content.equals(""))) {
+					Topic topic = new Topic(topicId, content, user.getUsername(), subforumId);
+					topic.setType(type);
+					
+					dao.addTopic(subforumId, topic);
+					
+					return "Added a topic" + topic.toString();
+				}
+				else {
+					return "Topic id and content are required fields!";
+				}
+				
+			}
+			else {
+				return "Topic with that name already exists, please choose different name!";
+			}
 		}
 		else {
 			return "Must be logged in to add topic!";

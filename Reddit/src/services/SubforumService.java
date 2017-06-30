@@ -46,9 +46,14 @@ public class SubforumService {
 		if(user != null) {
 			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
 				if(dao.searchSubforums(name) == null) {
-					Subforum subforum = new Subforum(name, description, rules, null, user);
-					dao.addSubforum(subforum);
-					return "Added a forum" + subforum.toString();
+					if(!(name.equals("") || description.equals("") || rules.equals(""))) {
+						Subforum subforum = new Subforum(name, description, rules, null, user);
+						dao.addSubforum(subforum);
+						return "Added a forum" + subforum.toString();
+					}
+					else {
+						return "Name, description and rules are required fileds!";
+					}
 				}
 				else {
 					return "Subforum already exists!";
@@ -115,7 +120,8 @@ public class SubforumService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String update(	@FormParam("name") String name, 
 							@FormParam("description") String description, 
-							@FormParam("rules") String rules){
+							@FormParam("rules") String rules,
+							@FormParam("moderator") String moderator){
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
@@ -126,6 +132,7 @@ public class SubforumService {
 			if(subforum != null) {
 				subforum.setName(name);
 				subforum.setDescription(description);
+				subforum.setResponsibleModerator(dao.searchUser(moderator));
 				subforum.setRules(rules);
 				dao.saveDatabase();
 				

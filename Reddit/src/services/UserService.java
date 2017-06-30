@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import beans.Subforum;
 import beans.User;
 import dao.ApplicationDAO;
 import utils.Config;
@@ -41,10 +42,10 @@ public class UserService {
 		
 		if (username == null || password == null || email == null
 				|| username.equals("") || password.equals("") || email.equals("")) {
-			return "Something went wrong. User cannot be registered!";
+			return "Username, password and email are required fields.";
 		}
 		if (dao.searchUser(username) != null) {
-			return "Something went wrong. User cannot be registered!";
+			return "Username is taken, please choose different username!";
 		}
 		else {
 			User user = new User(username, password, email, name, surname, phoneNumber);
@@ -63,7 +64,7 @@ public class UserService {
 		HttpSession session = request.getSession();
 		
 		if (username == null || password == null || username.equals("") || password.equals("")) {
-			return "Something went wrong. User cannot be logged in!";
+			return "Fill both username and password field to log in!";
 		}
 		if (dao.searchUser(username) != null) {
 			
@@ -99,13 +100,24 @@ public class UserService {
 
 			if(user.getRole().equals(Config.ADMIN)) {
 				
+				
 				if(role.equals("admin")) {
 					dao.changeUserRole(username, Config.ADMIN);
 				}
-				else if(role.equals("moderator")) {
+				else if(role.equals("moderator")) {						
 					dao.changeUserRole(username, Config.MODERATOR);
 				}
 				else if(role.equals("user")) {
+					User tempUser = dao.searchUser(username);
+					
+					if(tempUser.getRole().equals(Config.MODERATOR)) {
+						for(Subforum subforum :dao.getSubforums()) {
+							if(subforum.getResponsibleModerator().equals(tempUser.getUsername())) {
+								subforum.setResponsibleModerator(dao.searchUser("admin"));
+							}
+						}
+					}
+					
 					dao.changeUserRole(username, Config.USER);
 				}
 				dao.saveDatabase();
@@ -148,6 +160,7 @@ public class UserService {
 		
 		if(user != null) {
 			user.getMessages().get(messageId).setSeen(true);
+			dao.saveDatabase();
 			return "Message seen!";
 		}
 		else {
