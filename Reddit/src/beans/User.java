@@ -27,6 +27,29 @@ public class User implements Serializable {
 	private List<Topic> dislikedTopics;
 	private List<Comment> comments;
 	private List<Message> messages;
+	
+	public User() {
+		
+	}
+	
+	public User(String username, String password) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.email = "";
+		this.name = "";
+		this.surname = "";
+		this.phoneNumber = "";
+		this.registrationDate = (new Date()).toString();
+		this.role = Config.USER;
+		this.followedSubforums = new ArrayList<String>();
+		this.savedTopics = new ArrayList<Topic>();
+		this.savedComments = new ArrayList<Comment>();
+		this.likedTopics = new ArrayList<Topic>();
+		this.dislikedTopics = new ArrayList<Topic>();
+		this.comments = new ArrayList<Comment>();
+		this.messages = new ArrayList<Message>();
+	}
 
 	public User(String username, String password, String email, String name, String surname, String phoneNumber) {
 		super();
@@ -195,8 +218,10 @@ public class User implements Serializable {
 		savedComments.add(comment);
 	}
 
-	public void followForum(Subforum subforum) {
-		followedSubforums.add(subforum.getName());
+	public void followForum(String subforumId) {
+		if(followsSubforum(subforumId) == false) {
+			followedSubforums.add(subforumId);
+		}
 	}
 
 	public boolean followsSubforum(String subforumId) {

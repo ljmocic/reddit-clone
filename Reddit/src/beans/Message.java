@@ -13,6 +13,10 @@ public class Message implements Serializable{
 	private boolean hasReport;
 	private Report report;
 	
+	public Message() {
+		
+	}
+	
 	public Message(String senderId, String receiverId, String content) {
 		super();
 		this.senderId = senderId;

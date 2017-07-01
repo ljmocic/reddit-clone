@@ -7,20 +7,14 @@ $(document).ready(function () {
     $('#moderatorActions').hide();
     $('#adminActions').hide();
 
+    $('#showProfileLink').click(function () {
+        loadProfileDetails();
+    });
+
     checkLoggedInStatus();
-
-    loadFollowedSubforum();
-
-    loadProfileDetails();
 
     loadSubforumLinks();
 
-    loadUserList();
-
-    loadMessages();
-
-    // forms setup
-    // TODO refactor later
     var loginFormId = 'loginForm';
     $('#' + loginFormId).submit(function (e) {
         handleForm(e, loginFormId);
@@ -50,6 +44,16 @@ $(document).ready(function () {
     var reportSubforumFormId = 'reportSubforumForm';
     $('#' + reportSubforumFormId).submit(function (e) {
         handleForm(e, reportSubforumFormId);
+    });
+
+    var advancedSearchSubforumsFormId = 'advancedSearchSubforumsForm';
+    $('#' + advancedSearchSubforumsFormId).submit(function (e) {
+        handleForm(e, advancedSearchSubforumsFormId, subforumSearchResponse);
+    });
+
+    var advancedSearchTopicsFormId = 'advancedSearchTopicsForm';
+    $('#' + advancedSearchTopicsFormId).submit(function (e) {
+        handleForm(e, advancedSearchTopicsFormId, topicSearchResponse);
     });
 
     // topic handlers
@@ -101,6 +105,36 @@ function uploadFile() {
     alert("To do upload!");
 }
 
+function subforumSearchResponse(data) {
+    // alert("test!");
+    $('#SubforumsSearchResults').empty();
+
+    for (var i = 0; i < data.responseJSON.length; i++) {
+        $('#SubforumsSearchResults').append('<p><a href="#" id="' + data.responseJSON[i].name + '" class="searchSubforumLink">' + data.responseJSON[i].name + '</a></p>');
+    }
+
+    $('.searchSubforumLink').click(function () {
+        var clickedButtonId = $(this).attr('id');
+        $('.modal').modal('hide');
+        loadSubforum(clickedButtonId);
+    });
+
+    $('#advancedSearchSubforums').modal('hide');
+    $('#searchResultPage').modal('show');
+}
+
+function topicSearchResponse(data) {
+    // alert("test!");
+    $('#TopicsSearchResults').empty();
+
+    for (var i = 0; i < data.responseJSON.length; i++) {
+        $('#TopicsSearchResults').append('<p><a href="#" class="topicId' + data.responseJSON[i].parentSubforumName + '">' + data.responseJSON[i].name + '</a></p>');
+    }
+
+    $('#advancedSearchTopics').modal('hide');
+    $('#searchResultPage').modal('show');
+}
+
 function followSubforum() {
     var subforumId = $('#subforumNameH3').text();
     $.ajax({
@@ -119,7 +153,7 @@ function editSubforum() {
         $('#EditSubforumFormName').val(subforum.name);
         $('#EditSubforumFormDescription').val(subforum.description);
         $('#EditSubforumFormRules').val(subforum.rules);
-        $('#EditSubforumFormModerator').val(subforum.responsibleModerator.username);
+        $('#EditSubforumFormModerator').val(subforum.responsibleModerator);
 
         $('#editSubforum').modal('show');
     });
@@ -151,21 +185,34 @@ function logoutUser() {
     });
 }
 
-function handleForm(e, formId) {
+function handleForm(e, formId, responseAction) {
     var form = $('#' + formId);
     e.preventDefault();
+
+    var input = $('#' + formId + ' :input');
+
+    var data = {};
+    for (var i = 0; i < input.length; i++) {
+        if (input[i].name) {
+            data[input[i].name] = input[i].value;
+        }
+    }
+
     $.ajax({
         type: form.attr('method'),
         url: form.attr('action'),
-        data: form.serialize(),
-        success: function (data) {
-            alert(data);
-            $('.modal').modal('hide');
-            refresh();
-        },
-        error: function (data) {
-            alert('An error occurred.');
-        },
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        complete: function (data) {
+            if (responseAction == undefined) {
+                alert(data.responseText);
+                $('.modal').modal('hide');
+                refresh();
+            }
+            else {
+                responseAction(data);
+            }
+        }
     });
 
 }
@@ -229,11 +276,11 @@ function loadMessages() {
 
 function deleteEntityNotification(message, messageId) {
     var path;
-    if (message.report.topic != undefined) {
-        path = "/topic/report/delete/";
-    }
-    else if (message.report.subforum != undefined) {
+    if (message.report.subforumId != undefined) {
         path = "/subforum/report/delete/";
+    }
+    if (message.report.topicId != undefined) {
+        path = "/topic/report/delete/";
     }
 
     $.ajax({
@@ -245,11 +292,11 @@ function deleteEntityNotification(message, messageId) {
 
 function warnEntityNotification(message, messageId) {
     var path;
-    if (message.report.topic != undefined) {
-        path = "/topic/warn/delete/";
+    if (message.report.subforumId != undefined) {
+        path = "/subforum/report/warn/";
     }
-    else if (message.report.subforum != undefined) {
-        path = "/subforum/warn/delete/";
+    if (message.report.topicId != undefined) {
+        path = "/topic/report/warn/";
     }
 
     $.ajax({
@@ -261,12 +308,13 @@ function warnEntityNotification(message, messageId) {
 
 function rejectEntityNotification(message, messageId) {
     var path;
-    if (message.report.topic != undefined) {
-        path = "/topic/report/reject/";
-    }
-    else if (message.report.subforum != undefined) {
+    if (message.report.subforumId != "") {
         path = "/subforum/report/reject/";
     }
+    if (message.report.topicId != "") {
+        path = "/topic/report/reject/";
+    }
+
 
     $.ajax({
         url: baseUrl + path + messageId
@@ -280,6 +328,8 @@ function setMessageSeen(messageId) {
         url: baseUrl + "/user/seen/" + messageId
     }).then(function (message) {
         alert(message);
+        $('#messages').empty();
+        loadMessages();
     });
 }
 
@@ -295,12 +345,15 @@ function checkLoggedInStatus() {
             $('#loggedInUsername').text(user.username);
             $('#navbarLoggedIn').show();
             $('#userActions').show();
-        }
-        if (user.role == "moderator" || user.role == "admin") {
-            $('#moderatorActions').show();
-        }
-        if (user.role == "admin") {
-            $('#adminActions').show();
+            if (user.role == "moderator" || user.role == "admin") {
+                $('#moderatorActions').show();
+            }
+            if (user.role == "admin") {
+                $('#adminActions').show();
+                loadUserList();
+            }
+            loadMessages();
+            loadFollowedSubforum();
         }
 
     });
@@ -450,6 +503,10 @@ function performSearch() {
 
     var searchQuery = $("#searchQuery").val();
 
+    if(searchQuery == "") {
+        return;
+    }
+
     $.ajax({
         url: baseUrl + "/index/searchSubforums/" + searchQuery
     }).then(function (subforums) {
@@ -508,7 +565,7 @@ function loadSubforum(subforumId, followedForumsMode) {
             }
             else {
                 $('#subforumName').empty();
-                $('#subforumName').append('<h3 id="subforumNameH3">' + topics[0].parentSubforumName + '</h3><a id="followSubforumLink" href="#">Follow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
+                $('#subforumName').append('<h3 id="subforumNameH3">' + subforumId + '</h3><a id="followSubforumLink" href="#">Follow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
                 $('#followSubforumLink').click(function () {
                     followSubforum();
                 });
@@ -535,9 +592,9 @@ function loadSubforum(subforumId, followedForumsMode) {
                     '<tr>' +
                     '<td class="likesCount">' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
                     '<td class="submittedBy">submitted by ' + topic.author + '</td>';
-                if(user != undefined) {
-                    if (topic.author == user.username || user.role == "moderator") {
-                    tableRow += '<td><a href="#" class="deleteTopic' + topics[0].parentSubforumName + '">Delete</a>&nbsp;<a href="#" class="editTopic' + topics[0].parentSubforumName + '">Edit</a></td>';
+                if (user != undefined) {
+                    if (topic.author == user.username || user.role == "moderator" || uset.role == "admin") {
+                        tableRow += '<td><a href="#" class="deleteTopic' + topics[0].parentSubforumName + '">Delete</a>&nbsp;<a href="#" class="editTopic' + topics[0].parentSubforumName + '">Edit</a></td>';
                     }
                     else {
                         tableRow += '<td></td>';
@@ -546,7 +603,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                 else {
                     tableRow += '<td></td>';
                 }
-                
+
                 tableRow += '</tr>' +
                     '<tr>' +
                     '<td class="dislikeTopicRow"><a href="#" class="dislikeTopic' + topics[0].parentSubforumName + '">Dislike</a></td>' +
@@ -598,7 +655,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/like/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    refresh();
+                    loadSubforum(topics[0].parentSubforumName);
                 });
 
             });
@@ -610,7 +667,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/dislike/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    refresh();
+                    loadSubforum(topics[0].parentSubforumName);
                 });
 
             });
@@ -622,7 +679,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/saveTopic/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    refresh();
+                    loadSubforum(topics[0].parentSubforumName);
                 });
 
             });
@@ -694,27 +751,33 @@ function loadSubforum(subforumId, followedForumsMode) {
 }
 
 function addTopic(e) {
+
+    var formId = "addTopicForm";
+    var activeSubforumId = $('#subforumNameH3').text();
+
+    var form = $('#' + formId);
     e.preventDefault();
 
-    var activeSubforumId = $('#subforumNameH3').text();
-    var form = $('#addTopicForm');
+    var input = $('#' + formId + ' :input');
 
-    alert(form.serialize());
+    var data = {};
+    for (var i = 0; i < input.length; i++) {
+        if (input[i].name) {
+            data[input[i].name] = input[i].value;
+        }
+    }
 
     $.ajax({
         type: form.attr('method'),
         url: baseUrl + '/topic/create/' + activeSubforumId,
-        data: form.serialize(),
-        success: function (data) {
-            alert(data);
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        complete: function (data) {
+            alert(data.responseText);
             $('.modal').modal('hide');
             loadSubforum(activeSubforumId);
-        },
-        error: function (data) {
-            alert('An error occurred.');
-        },
+        }
     });
-
 }
 
 function refresh() {

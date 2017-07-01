@@ -1,11 +1,12 @@
 package services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import beans.Message;
 import beans.Report;
 import beans.Subforum;
+import beans.SubforumSearchRequest;
 import beans.Topic;
 import beans.User;
 import dao.ApplicationDAO;
@@ -35,28 +37,27 @@ public class SubforumService {
 	
 	@POST
 	@Path("/create")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String create(	@FormParam("name") String name,
-							@FormParam("description") String description,
-							@FormParam("rules") String rules) {
+	public String create(Subforum subforumToAdd) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
-				if(dao.searchSubforums(name) == null) {
-					if(!(name.equals("") || description.equals("") || rules.equals(""))) {
-						Subforum subforum = new Subforum(name, description, rules, null, user);
+				if(dao.searchSubforums(subforumToAdd.getName()) == null) {
+					if(!(subforumToAdd.getName().equals("") || subforumToAdd.getDescription().equals("") || subforumToAdd.getRules().equals(""))) {
+						Subforum subforum = new Subforum(subforumToAdd.getName(), subforumToAdd.getDescription(), subforumToAdd.getRules(), null, user.getUsername());
 						dao.addSubforum(subforum);
-						return "Added a forum" + subforum.toString();
+						return "Added a forum " + subforumToAdd.getName();
 					}
 					else {
 						return "Name, description and rules are required fileds!";
 					}
 				}
 				else {
-					return "Subforum already exists!";
+					return "Subforum already exists!"; 
 				}
 			}
 			else {
@@ -118,22 +119,19 @@ public class SubforumService {
 	@POST
 	@Path("/update")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String update(	@FormParam("name") String name, 
-							@FormParam("description") String description, 
-							@FormParam("rules") String rules,
-							@FormParam("moderator") String moderator){
+	public String update(Subforum subforumToAdd){
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 
-			Subforum subforum = dao.searchSubforums(name);
+			Subforum subforum = dao.searchSubforums(subforumToAdd.getName());
 			
 			if(subforum != null) {
-				subforum.setName(name);
-				subforum.setDescription(description);
-				subforum.setResponsibleModerator(dao.searchUser(moderator));
-				subforum.setRules(rules);
+				subforum.setName(subforumToAdd.getName());
+				subforum.setDescription(subforumToAdd.getDescription());
+				subforum.setResponsibleModerator(subforumToAdd.getResponsibleModerator());
+				subforum.setRules(subforumToAdd.getRules());
 				dao.saveDatabase();
 				
 				return "Updated forum " + subforum.toString();
@@ -181,17 +179,10 @@ public class SubforumService {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
-		Subforum subforum = dao.searchSubforums(subforumId);
-		
 		if(user != null) {
-			if(subforum != null && !user.followsSubforum(subforumId)) {
-				user.followForum(subforum);
-				dao.saveDatabase();
-				return "Followed subforum " + subforum.getName();
-			}
-			else {
-				return "Error while trying to follow a subforum";
-			}
+			user.followForum(subforumId);
+			dao.saveDatabase();
+			return "Followed subforum " + subforumId;
 		}
 		else {
 			return "Must be logged in to follow a subforum!";
@@ -201,23 +192,22 @@ public class SubforumService {
 	@POST
 	@Path("/report")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String report(	@FormParam("subforumId") String subforumId,
-							@FormParam("complaintText") String complaintText) {
+	public String report(Report reportToAdd) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 			
-			Subforum subforum = dao.searchSubforums(subforumId);
+			Subforum subforum = dao.searchSubforums(reportToAdd.getSubforumId());
 			
 			if(subforum != null) {
 				
-				Report report =  new Report(complaintText, subforum, user.getUsername());
+				Report report =  new Report(reportToAdd.getText(), reportToAdd.getSubforumId(), "", user.getUsername());
 				
-				User moderator = dao.searchUser(subforum.getResponsibleModerator().getUsername());
+				User moderator = dao.searchUser(subforum.getResponsibleModerator());
 				
-				Message message = new Message(user.getUsername(), moderator.getUsername(), complaintText, true, report);
+				Message message = new Message(user.getUsername(), moderator.getUsername(), reportToAdd.getText(), true, report);
 				
 				// Notify administrators/moderators
 				dao.sendMessageToAdministrators(message);
@@ -252,9 +242,9 @@ public class SubforumService {
 			"Thank you for report! Reported subforum will be deleted."));
 			
 			admin.addMessage(new Message(user.getUsername(), admin.getUsername(),
-			"Warning, the subforum " + report.getSubforum().getName() + " has been reported for violating rules. It will be immediately deleted!"));
+			"Warning, the subforum " + report.getSubforumId() + " has been reported for violating rules. It will be immediately deleted!"));
 			
-			dao.deleteSubforum(report.getSubforum().getName());
+			dao.deleteSubforum(report.getSubforumId());
 			
 			return "Report author and topic author has beed notified.";
 		}
@@ -275,13 +265,13 @@ public class SubforumService {
 			
 			Report report = user.getMessages().get(messageId - 1).getReport();
 			
-			User moderator = report.getSubforum().getResponsibleModerator();
+			User moderator = dao.searchUser(dao.searchSubforums(report.getSubforumId()).getResponsibleModerator());
 			
 			user.addMessage(new Message("", user.getUsername(), 
 			"Thank you for report! Reported subforum author is notified about breaking rules."));
 			
 			moderator.addMessage(new Message("", moderator.getUsername(),
-			"Warning, the subforum " + report.getSubforum().getName() + " has been reported for violating rules."));
+			"Warning, the subforum " + report.getSubforumId() + " has been reported for violating rules."));
 			
 			return "Administrator has been notified.";
 		}
@@ -304,13 +294,70 @@ public class SubforumService {
 			User reportAuthor = dao.searchUser(report.getUserId());
 			reportAuthor.addMessage(new Message(user.getUsername(), 
 												reportAuthor.getUsername(), 
-			"Your report on subforum " + report.getSubforum().getName() + " has been rejected!"));
+			"Your report on subforum " + report.getSubforumId() + " has been rejected!"));
 			
 			return "Report successfully rejected, report author is notified.";
 		}
 		else {
 			return "Must be logged in!";
 		}
+	}
+	
+	@POST
+	@Path("/advancedSearch")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Subforum> searchSubforums(SubforumSearchRequest query) {
+		
+		List<Subforum> result = new ArrayList<Subforum>();
+		
+		
+		boolean subforumIdSearchStatus = false, descriptionSearchStatus = false, moderatorSearchStatus = false;
+		
+		if(!query.getSubforumId().equals("")) {
+			subforumIdSearchStatus = true;
+		}
+		if(!query.getDescription().equals("")) {
+			descriptionSearchStatus = true;
+		}
+		if(!query.getResponsibleModeratorId().equals("")) {
+			moderatorSearchStatus = true;
+		}
+		
+		for(Subforum subforum: dao.getSubforums()) {
+			boolean flag = false;
+			
+			if(subforumIdSearchStatus) {
+				if(subforum.getName().contains(query.getSubforumId())) {
+					flag = true;
+				}
+				else {
+					flag = false;
+				}
+			}
+			if(descriptionSearchStatus) {
+				if(subforum.getDescription().contains(query.getDescription())) {
+					flag = true;
+				}
+				else {
+					flag = false;
+				}
+			}
+			if(moderatorSearchStatus) {
+				if(subforum.getResponsibleModerator().contains(query.getResponsibleModeratorId())) {
+					flag = true;
+				}
+				else {
+					flag = false;
+				}
+			}
+			
+			if(flag) {
+				result.add(subforum);
+			}
+		}
+		
+		return result;
 	}
 	
 }

@@ -38,9 +38,9 @@ public class Application implements Serializable {
 		users.add(mod3);
 		
 		// init subforums
-		subforums.add(new Subforum("android", "test subforum description", "rules", "iconPath", mod1));
-		subforums.add(new Subforum("ios", "test subforum description", "rules", "iconPath", mod2));
-		subforums.add(new Subforum("windows", "test subforum description", "rules", "iconPath", mod3));
+		subforums.add(new Subforum("android", "test subforum description", "rules", "iconPath", "mod1"));
+		subforums.add(new Subforum("ios", "test subforum description", "rules", "iconPath", "mod2"));
+		subforums.add(new Subforum("windows", "test subforum description", "rules", "iconPath", "mod3"));
 		
 		// add classic user
 		User user = new User("user", "user", "user@gmail.com", "user", "user", "phoneNumber");

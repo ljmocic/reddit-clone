@@ -7,25 +7,20 @@ public class Report implements Serializable {
 
 	private String text;
 	private String date;
-	private Subforum subforum;
-	private Topic topic;
+	private String subforumId;
+	private String topicId;
 	private String userId;
 	
-	public Report(String text, Subforum subforum, String userId) {
-		super();
-		this.text = text;
-		this.date = null;
-		this.subforum = subforum;
-		this.topic = null;
-		this.userId = userId;
+	public Report() {
+		
 	}
 	
-	public Report(String text, Topic topic, String userId) {
+	public Report(String text, String subforumId, String topicId, String userId) {
 		super();
 		this.text = text;
 		this.date = null;
-		this.subforum = null;
-		this.topic = topic;
+		this.subforumId = subforumId;
+		this.topicId = topicId;
 		this.userId = userId;
 	}
 
@@ -45,20 +40,20 @@ public class Report implements Serializable {
 		this.date = date;
 	}
 
-	public Subforum getSubforum() {
-		return subforum;
+	public String getSubforumId() {
+		return subforumId;
 	}
 
-	public void setSubforum(Subforum subforum) {
-		this.subforum = subforum;
+	public void setSubforum(String subforumId) {
+		this.subforumId = subforumId;
 	}
 
-	public Topic getTopic() {
-		return topic;
+	public String getTopicId() {
+		return topicId;
 	}
 
-	public void setTopic(Topic topic) {
-		this.topic = topic;
+	public void setTopicId(String topicId) {
+		this.topicId = topicId;
 	}
 
 	public String getUserId() {

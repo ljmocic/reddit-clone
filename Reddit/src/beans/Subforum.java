@@ -10,20 +10,24 @@ public class Subforum implements Serializable {
 	private String name;
 	private String description;
 	private String icon;
-	private User responsibleModerator;
+	private String responsibleModeratorId;
 	private String rules;
 	
 	private List<Topic> topics;
 	
 	private List<User> moderators;
+	
+	public Subforum() {
+		
+	}
 
-	public Subforum(String name, String description, String rules, String icon, User responsibleModerator) {
+	public Subforum(String name, String description, String rules, String icon, String responsibleModeratorId) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.rules = rules;
 		this.icon = icon;
-		this.responsibleModerator = responsibleModerator;
+		this.responsibleModeratorId = responsibleModeratorId;
 		this.topics = new ArrayList<Topic>();
 		this.moderators = new ArrayList<User>();
 		
@@ -60,12 +64,12 @@ public class Subforum implements Serializable {
 		this.icon = icon;
 	}
 
-	public User getResponsibleModerator() {
-		return responsibleModerator;
+	public String getResponsibleModerator() {
+		return responsibleModeratorId;
 	}
 
-	public void setResponsibleModerator(User responsibleModerator) {
-		this.responsibleModerator = responsibleModerator;
+	public void setResponsibleModerator(String responsibleModeratorId) {
+		this.responsibleModeratorId = responsibleModeratorId;
 	}
 
 	public String getRules() {

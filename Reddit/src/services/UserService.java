@@ -4,7 +4,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,25 +30,19 @@ public class UserService {
 
 	@POST
 	@Path("/register")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String register( @FormParam("username") String username,
-							@FormParam("password") String password,
-							@FormParam("email") String email,
-							@FormParam("name") String name,
-							@FormParam("surname") String surname,
-							@FormParam("phoneNumber") String phoneNumber) {
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String register(User userToRegister) {
 		
-		if (username == null || password == null || email == null
-				|| username.equals("") || password.equals("") || email.equals("")) {
+		if (userToRegister.getUsername() == null || userToRegister.getPassword() == null ||  userToRegister.getEmail()== null
+				|| userToRegister.getUsername().equals("") || userToRegister.getPassword().equals("") || userToRegister.getEmail().equals("")) {
 			return "Username, password and email are required fields.";
 		}
-		if (dao.searchUser(username) != null) {
+		if (dao.searchUser(userToRegister.getUsername()) != null) {
 			return "Username is taken, please choose different username!";
 		}
 		else {
-			User user = new User(username, password, email, name, surname, phoneNumber);
-			dao.addUser(user);
+			dao.addUser(userToRegister);
 			dao.saveDatabase();
 			return "Succesfully registered!";
 		}
@@ -57,20 +50,21 @@ public class UserService {
 	
 	@POST
 	@Path("/login")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String login(@FormParam("username") String username, @FormParam("password") String password) {
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String login(User userToLogIn) {
 
 		HttpSession session = request.getSession();
 		
-		if (username == null || password == null || username.equals("") || password.equals("")) {
+		if (userToLogIn.getUsername() == null || userToLogIn.getPassword() == null || 
+				userToLogIn.getUsername().equals("") || userToLogIn.getPassword().equals("")) {
 			return "Fill both username and password field to log in!";
 		}
-		if (dao.searchUser(username) != null) {
+		if (dao.searchUser(userToLogIn.getUsername()) != null) {
 			
-			User user = dao.searchUser(username);
+			User user = dao.searchUser(userToLogIn.getUsername());
 			
-			if(user.getPassword().equals(password) == true) {
+			if(user.getPassword().equals(userToLogIn.getPassword()) == true) {
 				session.setAttribute("user", user);
 				dao.saveDatabase();
 				return "Successfully logged in!";
@@ -113,7 +107,7 @@ public class UserService {
 					if(tempUser.getRole().equals(Config.MODERATOR)) {
 						for(Subforum subforum :dao.getSubforums()) {
 							if(subforum.getResponsibleModerator().equals(tempUser.getUsername())) {
-								subforum.setResponsibleModerator(dao.searchUser("admin"));
+								subforum.setResponsibleModerator("admin");
 							}
 						}
 					}

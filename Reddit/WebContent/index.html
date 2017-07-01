@@ -6,7 +6,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<!--<link rel="icon" href="/img/favicon.ico">-->
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
 
 	<title>Index</title>
 
@@ -52,7 +53,7 @@
                             <span id="loggedInUsername"></span>
 							<span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="" data-toggle="modal" data-target="#profilePage">Profile</a></li>
+							<li><a href="" id="showProfileLink" data-toggle="modal" data-target="#profilePage">Profile</a></li>
 							<li><a href="" data-toggle="modal" data-target="#showInbox">Inbox&nbsp;<span id="receivedMessagesBadge" class="badge">0</span></a></li>
 							<li class="divider"></li>
 							<li><a id="logout" href="#">Logout</a>
@@ -107,6 +108,8 @@
 						</button>
 						</span>
 					</div>
+					<a href="#" data-toggle="modal" data-target="#advancedSearchSubforums">Subforums</a>
+					<a href="#" data-toggle="modal" data-target="#advancedSearchTopics">Topics</a>
 				</div>
 
 				<!-- Subforums -->
@@ -256,7 +259,7 @@
 							<div class="form-group">
 								<label for="name" class="col-sm-2 control-label">Name</label>
 								<div class="col-sm-10">
-									<input name="topicId" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
+									<input name="name" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
 								</div>
 							</div>
 							<div class="form-group">
@@ -366,7 +369,7 @@
 							<div class="form-group">
 								<label for="content" class="col-sm-2 control-label">Content</label>
 								<div class="col-sm-10">
-									<textarea name="complaintText" id="reportInputComplaintText" class="form-control" placeholder="Enter complaint text" rows="5"></textarea>
+									<textarea name="text" id="reportInputComplaintText" class="form-control" placeholder="Enter complaint text" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -396,12 +399,14 @@
 									<input name="name" type="text" class="form-control" id="name" placeholder="Enter subforum name">
 								</div>
 							</div>
+							<!--
 							<div class="form-group">
 								<label for="icon" class="col-sm-2 control-label">Description</label>
 								<div class="col-sm-10">
 									<input type="file" name="uploadFile" />
 								</div>
 							</div>
+							-->
 							<div class="form-group">
 								<label for="description" class="col-sm-2 control-label">Description</label>
 								<div class="col-sm-10">
@@ -454,7 +459,7 @@
 							<div class="form-group">
 								<label for="EditSubforumFormModerator" class="col-sm-2 control-label">Moderator</label>
 								<div class="col-sm-10">
-									<input name="rules" id="EditSubforumFormModerator" class="form-control" name="moderator" placeholder="Enter moderator username">
+									<input name="responsibleModerator" id="EditSubforumFormModerator" class="form-control" placeholder="Enter moderator username">
 								</div>
 							</div>
 							<div class="form-group">
@@ -498,7 +503,7 @@
 							<div class="form-group">
 								<label for="reportText" class="col-sm-2 control-label">Report</label>
 								<div class="col-sm-10">
-									<textarea name="complaintText" id="reportText" class="form-control" placeholder="Enter report text" rows="5"></textarea>
+									<textarea name="text" id="reportText" class="form-control" placeholder="Enter report text" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -537,7 +542,7 @@
 							<div class="form-group">
 								<label for="receiver" class="col-sm-2 control-label">Receiver</label>
 								<div class="col-sm-10">
-									<input name="receiver" type="text" class="form-control" id="receiver" placeholder="Enter receiver's username">
+									<input name="receiverId" type="text" class="form-control" id="receiver" placeholder="Enter receiver's username">
 								</div>
 							</div>
 							<div class="form-group">
@@ -646,6 +651,89 @@
 				</div>
 			</div>
 		</div>
+
+		<div id="advancedSearchSubforums" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Advanced Search</h4>
+					</div>
+					<div class="modal-body">
+						<form id="advancedSearchSubforumsForm" class="form-horizontal" action="/reddit-clone/rest/subforum/advancedSearch" method="POST" role="form">
+							<div class="form-group">
+								<label for="advancedSearchSubforumId" class="col-sm-2 control-label">Subforum title</label>
+								<div class="col-sm-10">
+									<input name="subforumId" type="text" class="form-control" id="advancedSearchSubforumId" placeholder="Enter subforum name" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="advancedSearchDescription" class="col-sm-2 control-label">Subforum description</label>
+								<div class="col-sm-10">
+									<input name="description" type="text" class="form-control" id="advancedSearchDescription" placeholder="Enter subforum name" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="advancedSearchResponsibleModerator" class="col-sm-2 control-label">Subforum moderator</label>
+								<div class="col-sm-10">
+									<input name="responsibleModeratorId" type="text" class="form-control" id="advancedSearchResponsibleModerator" placeholder="Enter moderator name" >
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Search subforums</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="advancedSearchTopics" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Advanced Search</h4>
+					</div>
+					<div class="modal-body">
+						<form id="advancedSearchTopicsForm" class="form-horizontal" action="/reddit-clone/rest/topic/advancedSearch" method="POST" role="form">
+							<div class="form-group">
+								<label for="advancedSearchTopicId" class="col-sm-2 control-label">Topic title</label>
+								<div class="col-sm-10">
+									<input name="topicId" type="text" class="form-control" id="advancedSearchTopicId" placeholder="Enter topic name" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="advancedSearchContent" class="col-sm-2 control-label">Topic content</label>
+								<div class="col-sm-10">
+									<input name="content" type="text" class="form-control" id="advancedSearchContent" placeholder="Enter topic content" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="advancedSearchAuthor" class="col-sm-2 control-label">Topic author</label>
+								<div class="col-sm-10">
+									<input name="author" type="text" class="form-control" id="advancedSearchAuthor" placeholder="Enter author name" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="advancedSearchSubforum" class="col-sm-2 control-label">Subforum name</label>
+								<div class="col-sm-10">
+									<input name="subforumId" type="text" class="form-control" id="advancedSearchSubforum" placeholder="Enter subforum name" >
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary text-right">Search topics</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </body>
 

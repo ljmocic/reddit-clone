@@ -19,6 +19,10 @@ public class Topic implements Serializable {
 	private String parentSubforumName;
 	
 	private List<Comment> comments;
+	
+	public Topic() {
+		
+	}
 
 	public Topic(String name, String content, String author, String parentSubforumName) {
 		super();

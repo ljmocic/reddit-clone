@@ -1,9 +1,12 @@
 package services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,6 +20,7 @@ import beans.Message;
 import beans.Report;
 import beans.Subforum;
 import beans.Topic;
+import beans.TopicSearchRequest;
 import beans.User;
 import dao.ApplicationDAO;
 
@@ -33,21 +37,19 @@ public class TopicService {
 	
 	@POST
 	@Path("/create/{subforumId}")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String create(	@PathParam("subforumId") String subforumId,
-							@FormParam("topicId") String topicId,
-							@FormParam("type") String type,
-							@FormParam("content") String content) {
+	public String create(	@PathParam("subforumId") String subforumId, Topic topicToAdd) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 
-			if(dao.searchTopics(subforumId, topicId) == null) {
-				if(!(topicId.equals("") || content.equals(""))) {
-					Topic topic = new Topic(topicId, content, user.getUsername(), subforumId);
-					topic.setType(type);
+			if(dao.searchTopics(subforumId, topicToAdd.getName()) == null) {
+				if(!(topicToAdd.getName().equals("") || topicToAdd.getContent().equals(""))) {
+					Topic topic = new Topic(topicToAdd.getName(), topicToAdd.getContent(), user.getUsername(), subforumId);
+					topic.setType(topicToAdd.getType());
 					
 					dao.addTopic(subforumId, topic);
 					
@@ -69,12 +71,11 @@ public class TopicService {
 	
 	@POST
 	@Path("/update/{subforumId}/{topicId}")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public String update(	@PathParam("subforumId") String subforumId,
 							@PathParam("topicId") String topicId,
-							@FormParam("name") String name, 
-							@FormParam("type") String type, 
-							@FormParam("content") String content){
+							Topic topicToAdd){
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
@@ -84,9 +85,9 @@ public class TopicService {
 			Topic topic = dao.searchTopics(subforumId, topicId);
 			
 			if(topic != null) {
-				topic.setName(name);
-				topic.setType(type);
-				topic.setContent(content);
+				topic.setName(topicToAdd.getName());
+				topic.setType(topicToAdd.getType());
+				topic.setContent(topicToAdd.getContent());
 				dao.saveDatabase();
 				
 				return "Updated topic " + topic.toString();
@@ -100,7 +101,6 @@ public class TopicService {
 		}
 		
 	}
-	
 	
 	@GET
 	@Path("/delete/{subforumId}/{topicId}")
@@ -282,25 +282,24 @@ public class TopicService {
 	
 	@POST
 	@Path("/report")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String report(	@FormParam("subforumId") String subforumId,
-							@FormParam("topicId") String topicId,
-							@FormParam("complaintText") String complaintText) {
+	public String report(Report reportToAdd) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 			
-			Subforum subforum = dao.searchSubforums(subforumId);
-			Topic topic = dao.searchTopics(subforumId, topicId);
+			Subforum subforum = dao.searchSubforums(reportToAdd.getSubforumId());
+			Topic topic = dao.searchTopics(reportToAdd.getSubforumId(), reportToAdd.getTopicId());
 			
 			if(topic != null && subforum != null) {
 				
-				Report report =  new Report(complaintText, topic, user.getUsername());
-				User moderator = dao.searchUser(subforum.getResponsibleModerator().getUsername());
+				Report report =  new Report(reportToAdd.getText(), topic.getParentSubforumName(), topic.getName(), user.getUsername());
+				User moderator = dao.searchUser(subforum.getResponsibleModerator());
 				
-				Message message = new Message(user.getUsername(), moderator.getUsername(), complaintText, true, report);
+				Message message = new Message(user.getUsername(), moderator.getUsername(), reportToAdd.getSubforumId(), true, report);
 				
 				// Notify administrators/moderators
 				moderator.addMessage(message);
@@ -334,7 +333,9 @@ public class TopicService {
 			
 			User reportAuthor = dao.searchUser(report.getUserId());
 			
-			String entityAuthorId = report.getTopic().getAuthor();
+			Topic topic = dao.searchTopics(report.getSubforumId(), report.getTopicId());
+			
+			String entityAuthorId = topic.getAuthor();
 			User entityAuthor = dao.searchUser(entityAuthorId);
 			
 			reportAuthor.addMessage(new Message(user.getUsername(), 
@@ -343,9 +344,9 @@ public class TopicService {
 			
 			entityAuthor.addMessage(new Message(user.getUsername(), 
 					entityAuthor.getUsername(), 
-					"The topic " + report.getTopic().getName() + " has been reported for violating rules. It will be immediately deleted!"));
+					"The topic " + topic.getName() + " has been reported for violating rules. It will be immediately deleted!"));
 			
-			dao.deleteTopic(report.getTopic().getParentSubforumName(), report.getTopic());
+			dao.deleteTopic(topic.getParentSubforumName(), topic);
 			
 			return "Report author and topic author has beed notified.";
 		}
@@ -368,7 +369,9 @@ public class TopicService {
 			
 			User reportAuthor = dao.searchUser(report.getUserId());
 			
-			String entityAuthorId = report.getTopic().getAuthor();
+			Topic topic = dao.searchTopics(report.getSubforumId(), report.getTopicId());
+			
+			String entityAuthorId = topic.getAuthor();
 			User entityAuthor = dao.searchUser(entityAuthorId);
 			
 			reportAuthor.addMessage(new Message(user.getUsername(), 
@@ -377,7 +380,7 @@ public class TopicService {
 			
 			entityAuthor.addMessage(new Message(user.getUsername(), 
 					entityAuthor.getUsername(), 
-					"Warning, the topic " + report.getTopic().getName() + " has been reported for violating rules."));
+					"Warning, the topic " + topic.getName() + " has been reported for violating rules."));
 			
 			return "Report author and topic author has been notified.";
 		}
@@ -397,10 +400,13 @@ public class TopicService {
 		if(user != null) {
 			
 			Report report = user.getMessages().get(messageId - 1).getReport();
+			
+			Topic topic = dao.searchTopics(report.getSubforumId(), report.getTopicId());
+			
 			User reportAuthor = dao.searchUser(report.getUserId());
 			reportAuthor.addMessage(new Message(user.getUsername(), 
 												reportAuthor.getUsername(), 
-												"Your report on " + report.getTopic().getName() + " has been rejected!"));
+												"Your report on " + topic.getName() + " has been rejected!"));
 			
 			return "Report successfully rejected, report author is notified.";
 		}
@@ -408,5 +414,81 @@ public class TopicService {
 			return "Must be logged in!";
 		}
 	}
+	
+	@POST
+	@Path("/advancedSearch")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Topic> searchTopics(TopicSearchRequest query) {
+		
+		List<Topic> result = new ArrayList<Topic>();
+		
+		
+		boolean subforumIdSearchStatus = false, contentSearchStatus = false, 
+				authorSearchStatus = false, topicIdSearchStatus = false;
+		
+		if(!query.getSubforumId().equals("")) {
+			subforumIdSearchStatus = true;
+		}
+		if(!query.getTopicId().equals("")) {
+			topicIdSearchStatus = true;
+		}
+		if(!query.getContent().equals("")) {
+			contentSearchStatus = true;
+		}
+		if(!query.getAuthor().equals("")) {
+			authorSearchStatus = true;
+		}
+		
+		for(Subforum subforum: dao.getSubforums()) {
+			for(Topic topic: subforum.getTopics()) {
+				boolean flag = false;
+				
+				if(subforumIdSearchStatus) {
+					if(topic.getParentSubforumName().contains(query.getSubforumId())) {
+						flag = true;
+					}
+					else {
+						flag = false;
+					}
+				}
+				
+				if(contentSearchStatus) {
+					if(topic.getContent().contains(query.getContent())) {
+						flag = true;
+					}
+					else {
+						flag = false;
+					}
+				}
+				
+				if(authorSearchStatus) {
+					if(topic.getAuthor().contains(query.getAuthor())) {
+						flag = true;
+					}
+					else {
+						flag = false;
+					}
+				}
+				
+				if(topicIdSearchStatus) {
+					if(topic.getName().contains(query.getTopicId())) {
+						flag = true;
+					}
+					else {
+						flag = false;
+					}
+				}
+				
+				if(flag) {
+					result.add(topic);
+				}
+				
+			}
+		}
+		
+		return result;
+	}
+	
 	
 }

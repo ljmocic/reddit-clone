@@ -6,7 +6,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -49,8 +49,10 @@ public class IndexService {
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
-			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
-				return dao.getUsers();
+			if(user.getRole() != null) {
+				if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
+					return dao.getUsers();
+				}
 			}
 		}
 		
@@ -59,19 +61,19 @@ public class IndexService {
 	
 	@POST
 	@Path("/message")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String sendMessage(	@FormParam("receiver") String receiverId,
-								@FormParam("content") String content) {
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String sendMessage(Message messageToAdd) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		
 		if(user != null) {
 			
-			User receiver = dao.searchUser(receiverId);
+			User receiver = dao.searchUser(messageToAdd.getReceiverId());
 			
 			if(receiver != null) {
-				Message message = new Message(user.getUsername(), receiver.getUsername(), content);
+				Message message = new Message(user.getUsername(), receiver.getUsername(), messageToAdd.getContent());
 				receiver.addMessage(message);
 				dao.saveDatabase();
 				
@@ -112,7 +114,7 @@ public class IndexService {
 		for(Subforum subforum: dao.getSubforums()) {
 			if( subforum.getName().contains(searchQuery) || 
 				subforum.getDescription().contains(searchQuery) ||
-				subforum.getResponsibleModerator().getName().contains(searchQuery)) {
+				subforum.getResponsibleModerator().contains(searchQuery)) {
 				
 				result.add(subforum);
 				
