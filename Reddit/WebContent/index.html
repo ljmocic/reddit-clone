@@ -9,13 +9,15 @@
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 
-	<title>Index</title>
+	<title>Reddit</title>
 
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<link href="css/index.css" rel="stylesheet">
 
 	<script src="js/jquery-3.2.1.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
+	<script src="js/validator.min.js"></script>
+
 	<script src="js/indexController.js"></script>
 
 	<style>
@@ -170,13 +172,13 @@
 							<div class="form-group">
 								<label for="username" class="col-sm-2 control-label">Username</label>
 								<div class="col-sm-10">
-									<input name="username" type="text" class="form-control" id="username" placeholder="Enter username">
+									<input name="username" type="text" data-minlength="3" class="form-control" id="username" placeholder="Enter username">
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="password" class="col-sm-2 control-label">Password</label>
 								<div class="col-sm-10">
-									<input name="password" type="password" id="password" class="form-control" name="password" placeholder="Enter password">
+									<input name="password" type="password" data-minlength="3" id="password" class="form-control" name="password" placeholder="Enter password">
 								</div>
 							</div>
 							<div class="form-group">
@@ -197,23 +199,23 @@
 						<h4 class="modal-title">Register user</h4>
 					</div>
 					<div class="modal-body">
-						<form id="registerForm" class="form-horizontal" action="/reddit-clone/rest/user/register" method="POST" role="form">
+						<form id="registerForm" class="form-horizontal" data-toggle="validator" action="/reddit-clone/rest/user/register" method="POST" role="form">
 							<div class="form-group">
-								<label for="username" class="col-sm-2 control-label">Username</label>
+								<label for="username" class="col-sm-2 control-label">Username*</label>
 								<div class="col-sm-10">
-									<input name="username" type="text" class="form-control" id="username" placeholder="Enter username">
+									<input name="username" type="text" data-minlength="3" class="form-control" id="username" placeholder="Enter username" required>
 								</div>
 							</div>
 							<div class="form-group">
-								<label for="password" class="col-sm-2 control-label">Password</label>
+								<label for="password" class="col-sm-2 control-label">Password*</label>
 								<div class="col-sm-10">
-									<input name="password" type="password" class="form-control" id="password" placeholder="Enter password">
+									<input name="password" type="password" data-minlength="3" class="form-control" id="password" placeholder="Enter password" required>
 								</div>
 							</div>
 							<div class="form-group">
-								<label for="email" class="col-sm-2 control-label">Email</label>
+								<label for="email" class="col-sm-2 control-label">Email*</label>
 								<div class="col-sm-10">
-									<input name="email" type="text" class="form-control" id="email" placeholder="Enter email">
+									<input name="email" type="email" class="form-control" id="email" placeholder="Enter email" required>
 								</div>
 							</div>
 							<div class="form-group">
@@ -231,7 +233,7 @@
 							<div class="form-group">
 								<label for="phone" class="col-sm-2 control-label">Phone</label>
 								<div class="col-sm-10">
-									<input name="phoneNumber" type="text" class="form-control" id="phone" placeholder="Enter phone number">
+									<input name="phoneNumber" type="number" class="form-control" id="phone" placeholder="Enter phone number">
 								</div>
 							</div>
 
@@ -259,7 +261,7 @@
 							<div class="form-group">
 								<label for="name" class="col-sm-2 control-label">Name</label>
 								<div class="col-sm-10">
-									<input name="name" type="text" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
+									<input name="name" type="text" data-minlength="3" class="form-control" id="AddTopicInputName" placeholder="Enter topic name">
 								</div>
 							</div>
 							<div class="form-group">
@@ -275,7 +277,7 @@
 							<div class="form-group">
 								<label for="content" class="col-sm-2 control-label">Content</label>
 								<div class="col-sm-10">
-									<textarea name="content" id="AddTopicInputContent" class="form-control" placeholder="Enter message" rows="5"></textarea>
+									<textarea name="content" data-minlength="3" id="AddTopicInputContent" class="form-control" placeholder="Enter message" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -300,7 +302,7 @@
 							<div class="form-group">
 								<label for="name" class="col-sm-2 control-label">Name</label>
 								<div class="col-sm-10">
-									<input name="name" type="text" class="form-control" id="EditTopicInputName" placeholder="Enter topic name">
+									<input name="name" type="text" data-minlength="3" class="form-control" id="EditTopicInputName" placeholder="Enter topic name">
 								</div>
 							</div>
 							<div class="form-group">
@@ -316,7 +318,7 @@
 							<div class="form-group">
 								<label for="content" class="col-sm-2 control-label">Content</label>
 								<div class="col-sm-10">
-									<textarea name="content" id="EditTopicInputContent" class="form-control" placeholder="Enter topic content" rows="5"></textarea>
+									<textarea name="content" data-minlength="3" id="EditTopicInputContent" class="form-control" placeholder="Enter topic content" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -369,7 +371,7 @@
 							<div class="form-group">
 								<label for="content" class="col-sm-2 control-label">Content</label>
 								<div class="col-sm-10">
-									<textarea name="text" id="reportInputComplaintText" class="form-control" placeholder="Enter complaint text" rows="5"></textarea>
+									<textarea name="text" data-minlength="3" id="reportInputComplaintText" class="form-control" placeholder="Enter complaint text" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -396,7 +398,7 @@
 							<div class="form-group">
 								<label for="name" class="col-sm-2 control-label">Name</label>
 								<div class="col-sm-10">
-									<input name="name" type="text" class="form-control" id="name" placeholder="Enter subforum name">
+									<input name="name" type="text" data-minlength="3" class="form-control" id="name" placeholder="Enter subforum name">
 								</div>
 							</div>
 							<!--
@@ -410,7 +412,7 @@
 							<div class="form-group">
 								<label for="description" class="col-sm-2 control-label">Description</label>
 								<div class="col-sm-10">
-									<input name="description" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
+									<input name="description" data-minlength="3" type="text" id="description" class="form-control" name="description" placeholder="Enter subforum description">
 								</div>
 							</div>
 							<div class="form-group">
@@ -441,25 +443,25 @@
 							<div class="form-group">
 								<label for="name" class="col-sm-2 control-label">Name</label>
 								<div class="col-sm-10">
-									<input name="name" type="text" class="form-control" id="EditSubforumFormName" placeholder="Enter subforum name" readonly>
+									<input name="name" type="text" data-minlength="3" class="form-control" id="EditSubforumFormName" placeholder="Enter subforum name" readonly>
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="EditSubforumFormDescription" class="col-sm-2 control-label">Description</label>
 								<div class="col-sm-10">
-									<input name="description" type="text" id="EditSubforumFormDescription" class="form-control" name="description" placeholder="Enter subforum description">
+									<input name="description" type="text" data-minlength="3" id="EditSubforumFormDescription" class="form-control" name="description" placeholder="Enter subforum description">
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="EditSubforumFormRules" class="col-sm-2 control-label">Rules</label>
 								<div class="col-sm-10">
-									<textarea name="rules" id="EditSubforumFormRules" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
+									<textarea name="rules" id="EditSubforumFormRules" data-minlength="3" class="form-control" name="rules" placeholder="Enter subforum rules" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="EditSubforumFormModerator" class="col-sm-2 control-label">Moderator</label>
 								<div class="col-sm-10">
-									<input name="responsibleModerator" id="EditSubforumFormModerator" class="form-control" placeholder="Enter moderator username">
+									<input name="responsibleModerator" id="EditSubforumFormModerator" data-minlength="3" class="form-control" placeholder="Enter moderator username">
 								</div>
 							</div>
 							<div class="form-group">
@@ -497,13 +499,13 @@
 							<div class="form-group">
 								<label for="name" class="col-sm-2 control-label">Name</label>
 								<div class="col-sm-10">
-									<input name="subforumId" type="text" class="form-control" id="reportSubforumFormName" placeholder="Enter subforum name" readonly>
+									<input name="subforumId" type="text" data-minlength="3" class="form-control" id="reportSubforumFormName" placeholder="Enter subforum name" readonly>
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="reportText" class="col-sm-2 control-label">Report</label>
 								<div class="col-sm-10">
-									<textarea name="text" id="reportText" class="form-control" placeholder="Enter report text" rows="5"></textarea>
+									<textarea name="text" id="reportText" data-minlength="3" class="form-control" placeholder="Enter report text" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -542,13 +544,13 @@
 							<div class="form-group">
 								<label for="receiver" class="col-sm-2 control-label">Receiver</label>
 								<div class="col-sm-10">
-									<input name="receiverId" type="text" class="form-control" id="receiver" placeholder="Enter receiver's username">
+									<input name="receiverId" type="text" data-minlength="3" class="form-control" id="receiver" placeholder="Enter receiver's username">
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="content" class="col-sm-2 control-label">Content</label>
 								<div class="col-sm-10">
-									<textarea name="content" id="content" class="form-control" placeholder="Enter message" rows="5"></textarea>
+									<textarea name="content" id="content" data-minlength="3" class="form-control" placeholder="Enter message" rows="5"></textarea>
 								</div>
 							</div>
 							<div class="form-group">

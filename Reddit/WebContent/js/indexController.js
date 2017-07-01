@@ -593,7 +593,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     '<td class="likesCount">' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
                     '<td class="submittedBy">submitted by ' + topic.author + '</td>';
                 if (user != undefined) {
-                    if (topic.author == user.username || user.role == "moderator" || uset.role == "admin") {
+                    if (topic.author == user.username || user.role == "moderator" || user.role == "admin") {
                         tableRow += '<td><a href="#" class="deleteTopic' + topics[0].parentSubforumName + '">Delete</a>&nbsp;<a href="#" class="editTopic' + topics[0].parentSubforumName + '">Edit</a></td>';
                     }
                     else {
@@ -655,7 +655,12 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/like/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    loadSubforum(topics[0].parentSubforumName);
+                    if($('#subforumNameH3').length == 0) {
+                        refresh();
+                    }
+                    else {
+                        loadSubforum(topics[0].parentSubforumName);
+                    }
                 });
 
             });
@@ -667,7 +672,12 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/dislike/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    loadSubforum(topics[0].parentSubforumName);
+                    if($('#subforumNameH3').length == 0) {
+                        refresh();
+                    }
+                    else {
+                        loadSubforum(topics[0].parentSubforumName);
+                    }
                 });
 
             });
@@ -679,7 +689,12 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/saveTopic/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    loadSubforum(topics[0].parentSubforumName);
+                    if($('#subforumNameH3').length == 0) {
+                        refresh();
+                    }
+                    else {
+                        loadSubforum(topics[0].parentSubforumName);
+                    }
                 });
 
             });
@@ -700,8 +715,12 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/delete/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    loadSubforum(topics[0].parentSubforumName);
-                    refresh();
+                    if($('#subforumNameH3').length == 0) {
+                        refresh();
+                    }
+                    else {
+                        loadSubforum(topics[0].parentSubforumName);
+                    }
                 });
 
             });

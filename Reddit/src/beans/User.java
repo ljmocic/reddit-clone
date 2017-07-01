@@ -29,7 +29,15 @@ public class User implements Serializable {
 	private List<Message> messages;
 	
 	public User() {
-		
+		this.registrationDate = (new Date()).toString();
+		this.role = Config.USER;
+		this.followedSubforums = new ArrayList<String>();
+		this.savedTopics = new ArrayList<Topic>();
+		this.savedComments = new ArrayList<Comment>();
+		this.likedTopics = new ArrayList<Topic>();
+		this.dislikedTopics = new ArrayList<Topic>();
+		this.comments = new ArrayList<Comment>();
+		this.messages = new ArrayList<Message>();
 	}
 	
 	public User(String username, String password) {
