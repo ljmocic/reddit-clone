@@ -27,6 +27,7 @@ public class User implements Serializable {
 	private List<Topic> dislikedTopics;
 	private List<Comment> comments;
 	private List<Message> messages;
+	private List<String> clickedTopics;
 	
 	public User() {
 		this.registrationDate = (new Date()).toString();
@@ -38,6 +39,7 @@ public class User implements Serializable {
 		this.dislikedTopics = new ArrayList<Topic>();
 		this.comments = new ArrayList<Comment>();
 		this.messages = new ArrayList<Message>();
+		this.clickedTopics = new ArrayList<String>();
 	}
 	
 	public User(String username, String password) {
@@ -57,6 +59,7 @@ public class User implements Serializable {
 		this.dislikedTopics = new ArrayList<Topic>();
 		this.comments = new ArrayList<Comment>();
 		this.messages = new ArrayList<Message>();
+		this.clickedTopics = new ArrayList<String>();
 	}
 
 	public User(String username, String password, String email, String name, String surname, String phoneNumber) {
@@ -76,6 +79,7 @@ public class User implements Serializable {
 		this.dislikedTopics = new ArrayList<Topic>();
 		this.comments = new ArrayList<Comment>();
 		this.messages = new ArrayList<Message>();
+		this.clickedTopics = new ArrayList<String>();
 	}
 
 	public String getUsername() {
@@ -198,6 +202,14 @@ public class User implements Serializable {
 		this.messages = messages;
 	}
 
+	public List<String> getClickedTopics() {
+		return clickedTopics;
+	}
+
+	public void setClickedTopics(List<String> clickedTopics) {
+		this.clickedTopics = clickedTopics;
+	}
+
 	@Override
 	public String toString() {
 		return "User [username=" + username + ", password=" + password + ", email=" + email + ", name=" + name
@@ -239,6 +251,10 @@ public class User implements Serializable {
 			}
 		}
 		return false;
+	}
+
+	public void addClickedTopic(String topicId) {
+		clickedTopics.add(topicId);
 	}
 	
 }

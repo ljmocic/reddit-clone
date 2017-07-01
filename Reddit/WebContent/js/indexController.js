@@ -15,6 +15,8 @@ $(document).ready(function () {
 
     loadSubforumLinks();
 
+    loadRecommendations();
+
     var loginFormId = 'loginForm';
     $('#' + loginFormId).submit(function (e) {
         handleForm(e, loginFormId);
@@ -103,6 +105,16 @@ $(document).ready(function () {
 
 function uploadFile() {
     alert("To do upload!");
+}
+
+function loadRecommendations() {
+    $.ajax({
+        url: baseUrl + "/index/recommendations"
+    }).then(function (data) {
+        for(var i = 0; i < data.length; i++) {
+            $('#recommendedTopicsList').append('<a href="#">' + data[i].name + '</a><br>');
+        }
+    });
 }
 
 function subforumSearchResponse(data) {
@@ -739,19 +751,28 @@ function loadSubforum(subforumId, followedForumsMode) {
 
                         $('#editTopicForm').submit(function (e) {
                             var form = $('#editTopicForm');
+
                             e.preventDefault();
+
+                            var input = $('#editTopicForm :input');
+
+                            var data = {};
+                            for (var i = 0; i < input.length; i++) {
+                                if (input[i].name) {
+                                    data[input[i].name] = input[i].value;
+                                }
+                            }
+                            
                             $.ajax({
                                 type: form.attr('method'),
                                 url: baseUrl + '/topic/update/' + topic.parentSubforumName + '/' + topic.name,
-                                data: form.serialize(),
-                                success: function (data) {
-                                    alert(data);
+                                contentType: "application/json",
+                                data: JSON.stringify(data),
+                                complete: function (data) {
+                                    alert(data.responseText);
                                     $('.modal').modal('hide');
-                                    refresh();
-                                },
-                                error: function (data) {
-                                    alert('An error occurred.');
-                                },
+                                    loadSubforum(topic.parentSubforumName);
+                                }
                             });
                         });
 

@@ -78,7 +78,7 @@ public class UserService {
 			return "Already logged in";
 		}
 		else {
-			return "Something went wrong. User cannot be logged in!";
+			return "User cannot be logged in!";
 		}
 	}
 	

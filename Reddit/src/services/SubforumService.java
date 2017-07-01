@@ -106,9 +106,16 @@ public class SubforumService {
 	public Topic loadTopic(	@PathParam("subforumId") String subforumId,
 							@PathParam("topicId") String topicId) {
 		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
 		Topic topic = dao.searchTopics(subforumId, topicId);
 		
 		if(topic != null) {
+			topic.click();
+			if(user != null) {
+				user.addClickedTopic(topic.getName());
+			}
 			return topic;
 		}
 		else {

@@ -15,6 +15,8 @@ public class Topic implements Serializable {
 	private String creationDate;
 	private int likes;
 	private int dislikes;
+	
+	private int clicks;
 
 	private String parentSubforumName;
 	
@@ -31,6 +33,7 @@ public class Topic implements Serializable {
 		this.creationDate = (new Date()).toString();
 		this.likes = 0;
 		this.dislikes = 0;
+		this.clicks = 0;
 		this.parentSubforumName = parentSubforumName;
 		this.comments = new ArrayList<Comment>();
 		this.content = content;
@@ -88,6 +91,14 @@ public class Topic implements Serializable {
 	public void setDislikes(int dislikes) {
 		this.dislikes = dislikes;
 	}
+	
+	public int getClicks() {
+		return clicks;
+	}
+
+	public void setClicks(int clicks) {
+		this.clicks = clicks;
+	}
 
 	public String getParentSubforumName() {
 		return parentSubforumName;
@@ -132,6 +143,10 @@ public class Topic implements Serializable {
 	
 	public void removeDislike() {
 		this.dislikes--;
+	}
+
+	public void click() {
+		clicks++;
 	}
 	
 }

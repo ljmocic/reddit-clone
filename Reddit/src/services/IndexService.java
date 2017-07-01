@@ -164,4 +164,54 @@ public class IndexService {
 		return result;
 	}
 	
+	@GET
+	@Path("/recommendations")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Topic> recommendations() {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		List<Topic> topics = new ArrayList<Topic>();
+		
+		for(Subforum subforum: dao.getSubforums()) {
+			for(Topic topic: subforum.getTopics()) {
+				topics.add(topic);
+			}
+		}
+		
+		List<Topic> best = new ArrayList<Topic>();
+		
+		int max = -1;
+		int maxTopicInd = 0;
+		
+		while(best.size() < 5) {
+			// find best, add to list, remove it
+			for(int j = 0; j < topics.size(); j++) {
+				if(topics.get(j).getClicks() > max) {
+					max = topics.get(j).getClicks();
+					maxTopicInd = j;
+				}
+			}
+			
+			if(user != null) {
+				for(int j = 0; j < user.getClickedTopics().size(); j++) {
+					
+					// if user already seen that article, remove it
+					if(user.getClickedTopics().get(j).equals(topics.get(maxTopicInd))) {
+						topics.remove(maxTopicInd);
+						continue;
+					}
+				}
+			} 
+			best.add(topics.get(maxTopicInd));
+			topics.remove(maxTopicInd);
+			
+			max = -1;
+			maxTopicInd = 0;
+		}
+		
+		return best;
+	}
+	
 }

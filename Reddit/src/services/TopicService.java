@@ -53,7 +53,7 @@ public class TopicService {
 					
 					dao.addTopic(subforumId, topic);
 					
-					return "Added a topic" + topic.toString();
+					return "Added a topic " + topic.getName();
 				}
 				else {
 					return "Topic id and content are required fields!";
@@ -90,7 +90,7 @@ public class TopicService {
 				topic.setContent(topicToAdd.getContent());
 				dao.saveDatabase();
 				
-				return "Updated topic " + topic.toString();
+				return "Updated topic " + topic.getName();
 			}
 			else {
 				return "Failed to update a topic";
