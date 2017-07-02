@@ -13,6 +13,7 @@ public class Comment implements Serializable {
 	private int likes;
 	private int dislikes;
 	private boolean modified;
+	private boolean deleted;
 
 	private Topic parentTopic;
 	private Comment parentComment;
@@ -25,6 +26,7 @@ public class Comment implements Serializable {
 		this.likes = 0;
 		this.dislikes = 0;
 		this.modified = false;
+		this.deleted = false;
 		this.parentTopic = parentTopic;
 		this.parentComment = parentComment;
 		this.childComments = new ArrayList<Comment>();
@@ -100,6 +102,14 @@ public class Comment implements Serializable {
 
 	public void setChildComments(List<Comment> childComments) {
 		this.childComments = childComments;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override

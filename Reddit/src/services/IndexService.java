@@ -170,6 +170,7 @@ public class IndexService {
 	public List<Topic> recommendations() {
 		
 		HttpSession session = request.getSession();
+		@SuppressWarnings("unused")
 		User user = (User) session.getAttribute("user");
 		
 		List<Topic> topics = new ArrayList<Topic>();
@@ -182,10 +183,12 @@ public class IndexService {
 		
 		List<Topic> best = new ArrayList<Topic>();
 		
-		int max = -1;
-		int maxTopicInd = 0;
 		
-		while(best.size() < 5) {
+		
+		while(best.size() < 5 || topics.size() < 5) {
+			int max = -1;
+			int maxTopicInd = 0;
+			
 			// find best, add to list, remove it
 			for(int j = 0; j < topics.size(); j++) {
 				if(topics.get(j).getClicks() > max) {
@@ -194,21 +197,23 @@ public class IndexService {
 				}
 			}
 			
+			// TODO check this code for edge cases
+			/*
 			if(user != null) {
 				for(int j = 0; j < user.getClickedTopics().size(); j++) {
 					
 					// if user already seen that article, remove it
-					if(user.getClickedTopics().get(j).equals(topics.get(maxTopicInd))) {
-						topics.remove(maxTopicInd);
-						continue;
+					if(topics.size() >= maxTopicInd) {
+						if(user.getClickedTopics().get(j).equals(topics.get(maxTopicInd).getName())) {
+							topics.remove(maxTopicInd);
+							break;
+						}
 					}
 				}
-			} 
+			}
+			*/
 			best.add(topics.get(maxTopicInd));
 			topics.remove(maxTopicInd);
-			
-			max = -1;
-			maxTopicInd = 0;
 		}
 		
 		return best;

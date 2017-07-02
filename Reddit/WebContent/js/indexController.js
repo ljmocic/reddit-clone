@@ -111,15 +111,20 @@ function loadRecommendations() {
     $.ajax({
         url: baseUrl + "/index/recommendations"
     }).then(function (data) {
-        for(var i = 0; i < data.length; i++) {
-            $('#recommendedTopicsList').append('<a href="#">' + data[i].name + '</a><br>');
+        for (var i = 0; i < data.length; i++) {
+            $('#recommendedTopicsList').append('<a href="#" id="' + data[i].parentSubforumName + '" class="topicIdRecommend">' + data[i].name + '</a><br>');
         }
+
+        $(".topicIdRecommend").click(topicIdClickHandler);
+
     });
 }
 
 function subforumSearchResponse(data) {
     // alert("test!");
     $('#SubforumsSearchResults').empty();
+    $('#TopicsSearchResults').empty();
+    $('#UsersSearchResults').empty();
 
     for (var i = 0; i < data.responseJSON.length; i++) {
         $('#SubforumsSearchResults').append('<p><a href="#" id="' + data.responseJSON[i].name + '" class="searchSubforumLink">' + data.responseJSON[i].name + '</a></p>');
@@ -137,7 +142,9 @@ function subforumSearchResponse(data) {
 
 function topicSearchResponse(data) {
     // alert("test!");
+    $('#SubforumsSearchResults').empty();
     $('#TopicsSearchResults').empty();
+    $('#UsersSearchResults').empty();
 
     for (var i = 0; i < data.responseJSON.length; i++) {
         $('#TopicsSearchResults').append('<p><a href="#" class="topicId' + data.responseJSON[i].parentSubforumName + '">' + data.responseJSON[i].name + '</a></p>');
@@ -288,10 +295,10 @@ function loadMessages() {
 
 function deleteEntityNotification(message, messageId) {
     var path;
-    if (message.report.subforumId != undefined) {
+    if (message.report.subforumId != "") {
         path = "/subforum/report/delete/";
     }
-    if (message.report.topicId != undefined) {
+    if (message.report.topicId != "") {
         path = "/topic/report/delete/";
     }
 
@@ -304,10 +311,10 @@ function deleteEntityNotification(message, messageId) {
 
 function warnEntityNotification(message, messageId) {
     var path;
-    if (message.report.subforumId != undefined) {
+    if (message.report.subforumId != "") {
         path = "/subforum/report/warn/";
     }
-    if (message.report.topicId != undefined) {
+    if (message.report.topicId != "") {
         path = "/topic/report/warn/";
     }
 
@@ -480,7 +487,7 @@ function loadProfileDetails() {
 
         $('#profileSavedTopic').empty();
         user.savedTopics.forEach(function (savedTopic) {
-            $('#profileSavedTopic').append('<p><a href="#" class="topicId' + savedTopic.parentSubforumName + '">' + savedTopic.name + '</a></p>');
+            $('#profileSavedTopic').append('<p><a href="#" id="' + savedTopic.parentSubforumName + '" class="topicId">' + savedTopic.name + '</a></p>');
         });
 
         $('#profileSavedComments').empty();
@@ -490,32 +497,65 @@ function loadProfileDetails() {
 
         $('#profileLikes').empty();
         user.likedTopics.forEach(function (likedTopic) {
-            $('#profileLikes').append('<p><a href="#" class="topicId' + likedTopic.parentSubforumName + '">' + likedTopic.name + '</a></p>');
+            $('#profileLikes').append('<p><a href="#" id="' + likedTopic.parentSubforumName + '" class="topicId">' + likedTopic.name + '</a></p>');
         });
 
         $('#profileDislikes').empty();
         user.dislikedTopics.forEach(function (dislikedTopic) {
-            $('#profileDislikes').append('<p><a href="#" class="topicId' + dislikedTopic.parentSubforumName + '">' + dislikedTopic.name + '</a></p>');
+            $('#profileDislikes').append('<p><a href="#" id="' + dislikedTopic.parentSubforumName + '" class="topicId">' + dislikedTopic.name + '</a></p>');
         });
 
         $('#profileFollowedSubforums').empty();
         user.followedSubforums.forEach(function (subforum) {
             $('#profileFollowedSubforums').append('<p><a href="#" id="' + subforum + '" class="profileSubforumLink">' + subforum + '</a></p>');
         });
+
         $('.profileSubforumLink').click(function () {
             var clickedButtonId = $(this).attr('id');
             $('.modal').modal('hide');
             loadSubforum(clickedButtonId);
         });
 
+        $('.topicId').click(topicIdClickHandler);
+
     });
+}
+
+function topicIdClickHandler() {
+    var clickedTopic = $(this).text();
+    var clickedTopicParentSubforum = $(this).attr("id");
+
+    $.ajax({
+        url: baseUrl + '/subforum/load/' + clickedTopicParentSubforum + '/' + clickedTopic + ''
+    }).then(function (topic) {
+
+        $('.modal').modal('hide');
+
+        $('#topicNameModal').empty();
+        $('#topicContentModal').empty();
+
+        $('#topicNameModal').append('<h4 class="modal-title">' + topic.name + '</h4>');
+
+        if (topic.type == "text") {
+            $('#topicContentModal').append('<div>' + topic.content + '</div>');
+        }
+        else if (topic.type == "link") {
+            $('#topicContentModal').append('<div><a href="' + topic.content + '">' + topic.name + '</a></div>');
+        }
+        else if (topic.type == "image") {
+            $('#topicContentModal').append('<img class="img-responsive" src="' + topic.content + '" alt="Nema prikaza" />');
+        }
+
+        $('#showTopic').modal('show');
+    });
+
 }
 
 function performSearch() {
 
     var searchQuery = $("#searchQuery").val();
 
-    if(searchQuery == "") {
+    if (searchQuery == "") {
         return;
     }
 
@@ -651,7 +691,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                         $('#topicContentModal').append('<div><a href="' + topic.content + '">' + topic.name + '</a></div>');
                     }
                     else if (topic.type == "image") {
-                        $('#topicContentModal').append('<div><img src="' + topic.content + '" alt="Nema prikaza"></div>');
+                        $('#topicContentModal').append('<div><img class="img-responsive" src="' + topic.content + '" alt="Nema prikaza"></div>');
                     }
 
                     $('#topicContentModal').append('<div>' + topic.content + '</div>');
@@ -667,7 +707,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/like/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    if($('#subforumNameH3').length == 0) {
+                    if ($('#subforumNameH3').length == 0) {
                         refresh();
                     }
                     else {
@@ -684,7 +724,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/dislike/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    if($('#subforumNameH3').length == 0) {
+                    if ($('#subforumNameH3').length == 0) {
                         refresh();
                     }
                     else {
@@ -701,7 +741,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/saveTopic/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    if($('#subforumNameH3').length == 0) {
+                    if ($('#subforumNameH3').length == 0) {
                         refresh();
                     }
                     else {
@@ -727,7 +767,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     url: baseUrl + '/topic/delete/' + topics[0].parentSubforumName + '/' + clickedTopicId
                 }).then(function (message) {
                     alert(message);
-                    if($('#subforumNameH3').length == 0) {
+                    if ($('#subforumNameH3').length == 0) {
                         refresh();
                     }
                     else {
@@ -762,7 +802,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                                     data[input[i].name] = input[i].value;
                                 }
                             }
-                            
+
                             $.ajax({
                                 type: form.attr('method'),
                                 url: baseUrl + '/topic/update/' + topic.parentSubforumName + '/' + topic.name,

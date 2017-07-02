@@ -442,10 +442,10 @@ public class TopicService {
 		
 		for(Subforum subforum: dao.getSubforums()) {
 			for(Topic topic: subforum.getTopics()) {
-				boolean flag = false;
+				boolean flag = true;
 				
 				if(subforumIdSearchStatus) {
-					if(topic.getParentSubforumName().contains(query.getSubforumId())) {
+					if(topic.getParentSubforumName().contains(query.getSubforumId()) && flag) {
 						flag = true;
 					}
 					else {
@@ -454,7 +454,7 @@ public class TopicService {
 				}
 				
 				if(contentSearchStatus) {
-					if(topic.getContent().contains(query.getContent())) {
+					if(topic.getContent().contains(query.getContent()) && flag) {
 						flag = true;
 					}
 					else {
@@ -463,7 +463,7 @@ public class TopicService {
 				}
 				
 				if(authorSearchStatus) {
-					if(topic.getAuthor().contains(query.getAuthor())) {
+					if(topic.getAuthor().contains(query.getAuthor()) && flag) {
 						flag = true;
 					}
 					else {
@@ -472,7 +472,7 @@ public class TopicService {
 				}
 				
 				if(topicIdSearchStatus) {
-					if(topic.getName().contains(query.getTopicId())) {
+					if(topic.getName().contains(query.getTopicId()) && flag) {
 						flag = true;
 					}
 					else {

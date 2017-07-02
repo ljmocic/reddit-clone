@@ -309,6 +309,7 @@ public class SubforumService {
 			return "Must be logged in!";
 		}
 	}
+
 	
 	@POST
 	@Path("/advancedSearch")
@@ -332,10 +333,10 @@ public class SubforumService {
 		}
 		
 		for(Subforum subforum: dao.getSubforums()) {
-			boolean flag = false;
+			boolean flag = true;
 			
 			if(subforumIdSearchStatus) {
-				if(subforum.getName().contains(query.getSubforumId())) {
+				if(subforum.getName().contains(query.getSubforumId()) && flag) {
 					flag = true;
 				}
 				else {
@@ -343,7 +344,7 @@ public class SubforumService {
 				}
 			}
 			if(descriptionSearchStatus) {
-				if(subforum.getDescription().contains(query.getDescription())) {
+				if(subforum.getDescription().contains(query.getDescription()) && flag) {
 					flag = true;
 				}
 				else {
@@ -351,7 +352,7 @@ public class SubforumService {
 				}
 			}
 			if(moderatorSearchStatus) {
-				if(subforum.getResponsibleModerator().contains(query.getResponsibleModeratorId())) {
+				if(subforum.getResponsibleModerator().contains(query.getResponsibleModeratorId()) && flag) {
 					flag = true;
 				}
 				else {
