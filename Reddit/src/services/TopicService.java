@@ -180,7 +180,7 @@ public class TopicService {
 						user.getDislikedTopics().remove(topic);
 						topic.removeDislike();
 						dao.saveDatabase();
-						return "Removed like!";
+						return "Removed dislike!";
 					}
 					else {
 						topic.like();

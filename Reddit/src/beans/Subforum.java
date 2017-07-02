@@ -34,10 +34,13 @@ public class Subforum implements Serializable {
 		initData();
 	}
 
-	private void initData() {		
-		topics.add(new Topic("topic1" + name, "content1", "admin", name));
+	private void initData() {
+		Topic temp = new Topic("topic1" + name, "content1", "admin", name);
+		topics.add(temp);
 		topics.add(new Topic("topic2"+ name, "content2", "admin", name));
 		topics.add(new Topic("topic3"+ name, "content3", "admin", name));
+		
+		topics.get(0).getComments().add(new Comment("admin", "TEST", temp.getParentSubforumName(), temp.getName(), null));
 	}
 
 	public String getName() {

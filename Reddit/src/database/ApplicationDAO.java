@@ -141,7 +141,7 @@ public class ApplicationDAO {
 		Topic topic = searchTopics(subforumId, topicId);
 		
 		for(Comment comment: topic.getComments()) {
-			if(comment.getText().equals(commentId)) {
+			if(comment.getId().equals(commentId)) {
 				return comment;
 			}
 		}

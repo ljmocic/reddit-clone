@@ -8,7 +8,7 @@ function loadSubforum(subforumId, followedForumsMode) {
             url: baseUrl + "/user/active/"
         }).then(function (user) {
 
-            
+
             if (followedForumsMode == true) {
 
             }
@@ -80,7 +80,105 @@ function loadSubforum(subforumId, followedForumsMode) {
                         $('#topicContentModal').append('<div><img class="img-responsive" src="' + topic.content + '" alt="Nema prikaza"></div>');
                     }
 
-                    //$('#topicContentModal').append('<div>' + topic.content + '</div>');
+                    var temp = "<h5>Comments</h5><hr><table><tbody>";
+                    if (topic.comments.length > 0) {
+                        
+                        topic.comments.forEach(function (comment) {
+
+
+                            var commentRow = '<tr>' +
+                                '<td>' +
+                                '<table id="' + topics[0].parentSubforumName + "_" + topic.name + "_" + comment.id + '">' +
+                                '<tbody>' +
+                                '<tr>' +
+                                '<td class="likeTopicRow"><a href="#" class="likeComment">Like</a></td>' +
+                                '<td class="likeTopicRow">' + comment.text + '  </td>' +
+                                '<td class="likeTopicRow"><!--<a href="#" class="saveComment">Save</a>--></td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                '<td class="likeTopicRow">' + (parseInt(comment.likes) - parseInt(comment.dislikes)) + '</td>' +
+                                '<td class="likeTopicRow">submitted by ' + comment.author + '</td>';
+                            if (user != undefined) {
+                                if (comment.author == user.username || user.role == "moderator" || user.role == "admin") {
+                                    commentRow += '<td><a href="#" class="deleteComment">Delete</a></td>';
+                                }
+                                else {
+                                    commentRow += '<td></td>';
+                                }
+                            }
+                            else {
+                                commentRow += '<td></td>';
+                            }
+
+                            commentRow += '</tr>' +
+                                '<tr>' +
+                                '<td class="likeTopicRow"><a href="#" class="dislikeComment">Dislike</a></td>' +
+                                '<td class="likeTopicRow"></td>' +
+                                '<td clsss="likeTopicRow"></td>' +
+                                '</tr>' +
+                                '</tbody>' +
+                                '</table>' +
+                                '</td>'
+                            '</tr>';
+
+
+                            temp += commentRow;
+                        });
+
+                    }
+                    temp += '</tbody></table>';
+                    $('#topicContentModal').append(temp);
+                    $('#topicContentModal').append('<textarea name="content" data-minlength="3" id="newCommentText" class="form-control" placeholder="Enter comment" rows="2"></textarea>');
+                    $('#topicContentModal').append('<button id="addCommentButton" class="btn btn-primary text-right">Add comment</button>');
+                    
+
+                    $('#addCommentButton').click(function () {
+                        // send request to add comment
+                        // with info about subforum id topic id 
+                        var commentText = $('#newCommentText').val();
+                        var commentId = topics[0].parentSubforumName + "_" + topic.name;
+
+                        $.ajax({
+                            url: baseUrl + '/comment/create/' + commentId + '/' + commentText
+                        }).then(function (message) {
+                            alert(message);
+                            refresh();
+                        });
+                    });
+
+                    $('.likeComment').click(function () {
+                        var commentRestId = $(this).parents('table').attr('id');
+
+                        $.ajax({
+                            url: baseUrl + '/comment/like/' + commentRestId + ''
+                        }).then(function (message) {
+                            alert(message);
+                            refresh();
+                        });
+                    });
+
+                    $('.dislikeComment').click(function () {
+                        var commentRestId = $(this).parents('table').attr('id');
+
+                        $.ajax({
+                            url: baseUrl + '/comment/dislike/' + commentRestId + ''
+                        }).then(function (message) {
+                            alert(message);
+                            refresh();
+                        });
+                    });
+
+                    $('.deleteComment').click(function () {
+                        var commentRestId = $(this).parents('table').attr('id');
+
+                        $.ajax({
+                            url: baseUrl + '/comment/delete/' + commentRestId + ''
+                        }).then(function (message) {
+                            alert(message);
+                            refresh();
+                        });
+                    });
+
                     $('#showTopic').modal('show');
                 });
 
@@ -185,7 +283,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                             var data = {};
                             for (var i = 0; i < input.length; i++) {
                                 if (input[i].name) {
-                                    if(input[i].type != "file") {
+                                    if (input[i].type != "file") {
                                         data[input[i].name] = input[i].value;
                                     }
                                 }
@@ -212,20 +310,22 @@ function loadSubforum(subforumId, followedForumsMode) {
 
 function initSubforumHeader(subforumId, user) {
     $('#subforumName').empty();
-    
+
     var found = false;
-    for(var i = 0; i < user.followedSubforums.length; i++) {
-        if(user.followedSubforums[i] == subforumId) {
-            found = true;
+    if (user != undefined) {
+        for (var i = 0; i < user.followedSubforums.length; i++) {
+            if (user.followedSubforums[i] == subforumId) {
+                found = true;
+            }
         }
     }
-    if(found) {
+    if (found) {
         $('#subforumName').append('<h3 id="subforumNameH3">' + subforumId + '</h3><a id="unfollowSubforumLink" href="#">Unfollow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
     }
     else {
         $('#subforumName').append('<h3 id="subforumNameH3">' + subforumId + '</h3><a id="followSubforumLink" href="#">Follow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
     }
-    
+
     $('#followSubforumLink').click(function () {
         followSubforum();
     });
@@ -237,6 +337,7 @@ function initSubforumHeader(subforumId, user) {
     });
     $('#topics').empty();
     $('#addTopicButton').show();
+
 }
 
 function loadFollowedSubforum() {
@@ -309,7 +410,7 @@ function editSubforum() {
     $.ajax({
         url: baseUrl + "/subforum/" + activeSubforumId
     }).then(function (subforum) {
-        
+
         $('#EditSubforumFormName').val(subforum.name);
         $('#EditSubforumFormDescription').val(subforum.description);
         $('#EditSubforumFormRules').val(subforum.rules);

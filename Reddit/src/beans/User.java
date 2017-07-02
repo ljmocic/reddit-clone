@@ -25,6 +25,8 @@ public class User implements Serializable {
 	private List<Comment> savedComments;
 	private List<Topic> likedTopics;
 	private List<Topic> dislikedTopics;
+	private List<Comment> likedComments;
+	private List<Comment> dislikedComments;
 	private List<Comment> comments;
 	private List<Message> messages;
 	private List<String> clickedTopics;
@@ -37,6 +39,8 @@ public class User implements Serializable {
 		this.savedComments = new ArrayList<Comment>();
 		this.likedTopics = new ArrayList<Topic>();
 		this.dislikedTopics = new ArrayList<Topic>();
+		this.likedComments = new ArrayList<Comment>();
+		this.dislikedComments = new ArrayList<Comment>();
 		this.comments = new ArrayList<Comment>();
 		this.messages = new ArrayList<Message>();
 		this.clickedTopics = new ArrayList<String>();
@@ -57,6 +61,8 @@ public class User implements Serializable {
 		this.savedComments = new ArrayList<Comment>();
 		this.likedTopics = new ArrayList<Topic>();
 		this.dislikedTopics = new ArrayList<Topic>();
+		this.likedComments = new ArrayList<Comment>();
+		this.dislikedComments = new ArrayList<Comment>();
 		this.comments = new ArrayList<Comment>();
 		this.messages = new ArrayList<Message>();
 		this.clickedTopics = new ArrayList<String>();
@@ -77,6 +83,8 @@ public class User implements Serializable {
 		this.savedComments = new ArrayList<Comment>();
 		this.likedTopics = new ArrayList<Topic>();
 		this.dislikedTopics = new ArrayList<Topic>();
+		this.likedComments = new ArrayList<Comment>();
+		this.dislikedComments = new ArrayList<Comment>();
 		this.comments = new ArrayList<Comment>();
 		this.messages = new ArrayList<Message>();
 		this.clickedTopics = new ArrayList<String>();
@@ -209,6 +217,22 @@ public class User implements Serializable {
 	public void setClickedTopics(List<String> clickedTopics) {
 		this.clickedTopics = clickedTopics;
 	}
+	
+	public List<Comment> getLikedComments() {
+		return likedComments;
+	}
+
+	public void setLikedComments(List<Comment> likedComments) {
+		this.likedComments = likedComments;
+	}
+
+	public List<Comment> getDislikedComments() {
+		return dislikedComments;
+	}
+
+	public void setDislikedComments(List<Comment> dislikedComments) {
+		this.dislikedComments = dislikedComments;
+	}
 
 	@Override
 	public String toString() {
@@ -264,6 +288,14 @@ public class User implements Serializable {
 
 	public void addClickedTopic(String topicId) {
 		clickedTopics.add(topicId);
+	}
+
+	public void like(Comment comment) {
+		likedComments.add(comment);
+	}
+
+	public void dislike(Comment comment) {
+		dislikedComments.add(comment);
 	}
 	
 }
