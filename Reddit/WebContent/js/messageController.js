@@ -7,7 +7,7 @@ function loadMessages() {
         var unseenMessages = 0;
         messages.forEach(function (message) {
 
-            var messageRow = '<p>' + message.senderId + " " + message.content;
+            var messageRow = '<p>From: ' + message.senderId + " Message: " + message.content;
 
             if (message.hasReport == true && message.seen == false) {
                 messageRow += '&nbsp;<button type="button" id="deleteReport' + messageId + '" class="btn btn-info btn-sm">Delete</button>';

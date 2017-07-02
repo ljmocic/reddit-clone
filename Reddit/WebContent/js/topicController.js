@@ -50,6 +50,26 @@ function uploadImage() {
     });
 }
 
+function uploadUpdateImage() {
+
+    var file = $('#imageUpdateUpload')[0].files[0];
+
+    $.ajax({
+        url : baseUrl + "/topic/image",
+        type : "POST",
+        contentType : "multipart/form-data",
+        dataType: "json",
+        data: file,
+        processData: false,
+        async: false,
+        complete: function(response) {
+            //alert("File uploaded!");
+            //alert(response.responseText);
+            $("#EditTopicInputContent").val(response.responseText);
+        }
+    });
+}
+
 function topicIdClickHandler() {
     var clickedTopic = $(this).text();
     var clickedTopicParentSubforum = $(this).attr("id");

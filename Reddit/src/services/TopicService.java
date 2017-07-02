@@ -27,7 +27,7 @@ import beans.Subforum;
 import beans.Topic;
 import beans.TopicSearchRequest;
 import beans.User;
-import dao.ApplicationDAO;
+import database.ApplicationDAO;
 
 @Path("/topic")
 public class TopicService {
@@ -44,7 +44,7 @@ public class TopicService {
 	@Path("/create/{subforumId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String create(	@PathParam("subforumId") String subforumId, Topic topicToAdd) {
+	public String create(@PathParam("subforumId") String subforumId, Topic topicToAdd) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
@@ -103,8 +103,8 @@ public class TopicService {
 	@Path("/update/{subforumId}/{topicId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String update(	@PathParam("subforumId") String subforumId,
-							@PathParam("topicId") String topicId,
+	public String update(	@PathParam("subforumId") String subforumId, 
+							@PathParam("topicId") String topicId, 
 							Topic topicToAdd){
 		
 		HttpSession session = request.getSession();
@@ -185,8 +185,9 @@ public class TopicService {
 					else {
 						topic.like();
 						user.like(topic);
+						dao.saveDatabase();
 						return "Successfully liked!";
-					}
+					}	
 				}
 				else {
 					return "Already liked!";
@@ -206,7 +207,7 @@ public class TopicService {
 	@Path("/dislike/{subforumId}/{topicId}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String dislike(	@PathParam("subforumId") String subforumId,
-						@PathParam("topicId") String topicId) {
+							@PathParam("topicId") String topicId) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
@@ -412,6 +413,8 @@ public class TopicService {
 					entityAuthor.getUsername(), 
 					"Warning, the topic " + topic.getName() + " has been reported for violating rules."));
 			
+			dao.saveDatabase();
+			
 			return "Report author and topic author has been notified.";
 		}
 		else {
@@ -437,6 +440,8 @@ public class TopicService {
 			reportAuthor.addMessage(new Message(user.getUsername(), 
 												reportAuthor.getUsername(), 
 												"Your report on " + topic.getName() + " has been rejected!"));
+			
+			dao.saveDatabase();
 			
 			return "Report successfully rejected, report author is notified.";
 		}
@@ -519,6 +524,5 @@ public class TopicService {
 		
 		return result;
 	}
-	
 	
 }

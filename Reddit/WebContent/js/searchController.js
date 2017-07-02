@@ -1,5 +1,4 @@
 function subforumSearchResponse(data) {
-    // alert("test!");
     $('#SubforumsSearchResults').empty();
     $('#TopicsSearchResults').empty();
     $('#UsersSearchResults').empty();
@@ -19,14 +18,15 @@ function subforumSearchResponse(data) {
 }
 
 function topicSearchResponse(data) {
-    // alert("test!");
     $('#SubforumsSearchResults').empty();
     $('#TopicsSearchResults').empty();
     $('#UsersSearchResults').empty();
 
     for (var i = 0; i < data.responseJSON.length; i++) {
-        $('#TopicsSearchResults').append('<p><a href="#" class="topicId' + data.responseJSON[i].parentSubforumName + '">' + data.responseJSON[i].name + '</a></p>');
+        $('#TopicsSearchResults').append('<p><a href="#" id="' + data.responseJSON[i].parentSubforumName + '" class="topicIdSearch">' + data.responseJSON[i].name + '</a></p>');
     }
+
+    $('.topicIdSearch').click(topicIdClickHandler);
 
     $('#advancedSearchTopics').modal('hide');
     $('#searchResultPage').modal('show');

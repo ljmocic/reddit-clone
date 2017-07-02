@@ -1,4 +1,4 @@
-package dao;
+package database;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -243,6 +243,15 @@ public class User implements Serializable {
 			followedSubforums.add(subforumId);
 		}
 	}
+	
+	public void unfollowForum(String subforumId) {
+		for(String followedSubforum: followedSubforums) {
+			if(followedSubforum.equals(subforumId)) {
+				followedSubforums.remove(subforumId);
+				break;
+			}
+		}
+	}
 
 	public boolean followsSubforum(String subforumId) {
 		for(String followedSubforum: followedSubforums) {

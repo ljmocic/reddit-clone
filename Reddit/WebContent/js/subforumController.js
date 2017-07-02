@@ -8,25 +8,15 @@ function loadSubforum(subforumId, followedForumsMode) {
             url: baseUrl + "/user/active/"
         }).then(function (user) {
 
+            
             if (followedForumsMode == true) {
 
             }
             else {
-                $('#subforumName').empty();
-                $('#subforumName').append('<h3 id="subforumNameH3">' + subforumId + '</h3><a id="followSubforumLink" href="#">Follow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
-                $('#followSubforumLink').click(function () {
-                    followSubforum();
-                });
-                $('#reportSubforumLink').click(function () {
-                    reportSubforum();
-                });
-                $('#topics').empty();
-                $('#addTopicButton').show();
+                initSubforumHeader(subforumId, user);
             }
 
             topics.forEach(function (topic) {
-
-
 
                 var tableRow = '<tr>' +
                     '<td>' +
@@ -90,7 +80,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                         $('#topicContentModal').append('<div><img class="img-responsive" src="' + topic.content + '" alt="Nema prikaza"></div>');
                     }
 
-                    $('#topicContentModal').append('<div>' + topic.content + '</div>');
+                    //$('#topicContentModal').append('<div>' + topic.content + '</div>');
                     $('#showTopic').modal('show');
                 });
 
@@ -195,7 +185,9 @@ function loadSubforum(subforumId, followedForumsMode) {
                             var data = {};
                             for (var i = 0; i < input.length; i++) {
                                 if (input[i].name) {
-                                    data[input[i].name] = input[i].value;
+                                    if(input[i].type != "file") {
+                                        data[input[i].name] = input[i].value;
+                                    }
                                 }
                             }
 
@@ -211,19 +203,40 @@ function loadSubforum(subforumId, followedForumsMode) {
                                 }
                             });
                         });
-
                     }
                 });
-
-
-
-
             });
-
         });
-
     });
+}
 
+function initSubforumHeader(subforumId, user) {
+    $('#subforumName').empty();
+    
+    var found = false;
+    for(var i = 0; i < user.followedSubforums.length; i++) {
+        if(user.followedSubforums[i] == subforumId) {
+            found = true;
+        }
+    }
+    if(found) {
+        $('#subforumName').append('<h3 id="subforumNameH3">' + subforumId + '</h3><a id="unfollowSubforumLink" href="#">Unfollow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
+    }
+    else {
+        $('#subforumName').append('<h3 id="subforumNameH3">' + subforumId + '</h3><a id="followSubforumLink" href="#">Follow</a>&nbsp;<a id="reportSubforumLink" href="#">Report</a><br>');
+    }
+    
+    $('#followSubforumLink').click(function () {
+        followSubforum();
+    });
+    $('#unfollowSubforumLink').click(function () {
+        unfollowSubforum();
+    });
+    $('#reportSubforumLink').click(function () {
+        reportSubforum();
+    });
+    $('#topics').empty();
+    $('#addTopicButton').show();
 }
 
 function loadFollowedSubforum() {
@@ -249,12 +262,11 @@ function loadSubforumLinks() {
         url: baseUrl + "/index/subforums"
     }).then(function (subforums) {
 
-        
-
+        // add subforum links to modal and sidebar
         subforums.forEach(function (subforum) {
 
             var imageTag = '<img src="' + subforum.icon + '" alt="" />';
-            
+
             $('#subforumsLinks').append(
                 '<p>' + imageTag + '<a class="subforumLink" id="' + subforum.name + '" href="#">' + subforum.name + " - " + subforum.description + '</a></p>'
             );
@@ -262,6 +274,7 @@ function loadSubforumLinks() {
             $('#subforumsSidebarList').append(imageTag + '<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a><br>');
         });
 
+        // add click callbacks on all subforum links
         $(".subforumLink").click(function () {
             var clickedButtonId = $(this).attr('id');
             $('.modal').modal('hide');
@@ -277,6 +290,17 @@ function followSubforum() {
         url: baseUrl + "/subforum/follow/" + subforumId
     }).then(function (message) {
         alert(message);
+        loadSubforum(subforumId);
+    });
+}
+
+function unfollowSubforum() {
+    var subforumId = $('#subforumNameH3').text();
+    $.ajax({
+        url: baseUrl + "/subforum/unfollow/" + subforumId
+    }).then(function (message) {
+        alert(message);
+        loadSubforum(subforumId);
     });
 }
 
@@ -285,7 +309,7 @@ function editSubforum() {
     $.ajax({
         url: baseUrl + "/subforum/" + activeSubforumId
     }).then(function (subforum) {
-        //alert(message);
+        
         $('#EditSubforumFormName').val(subforum.name);
         $('#EditSubforumFormDescription').val(subforum.description);
         $('#EditSubforumFormRules').val(subforum.rules);
@@ -319,25 +343,24 @@ function addSubforumForm(e, formId, responseAction) {
     var file = $('#iconUpload')[0].files[0];
 
     $.ajax({
-        url : baseUrl + "/subforum/icon",
-        type : "POST",
-        contentType : "multipart/form-data",
+        url: baseUrl + "/subforum/icon",
+        type: "POST",
+        contentType: "multipart/form-data",
         dataType: "json",
         data: file,
         processData: false,
         async: false,
-        complete: function(response) {
-            alert("File uploaded!");
-            alert(response.responseText);
+        complete: function (response) {
+
+            //alert("File uploaded at: "+ response.responseText);
 
             var form = $('#' + formId);
-
             var input = $('#' + formId + ' :input');
 
             var data = {};
             for (var i = 0; i < input.length; i++) {
                 if (input[i].name) {
-                    if(input[i].type != "file") {
+                    if (input[i].type != "file") {
                         data[input[i].name] = input[i].value;
                     }
                 }
@@ -361,7 +384,7 @@ function addSubforumForm(e, formId, responseAction) {
                     }
                 }
             });
-            
+
         }
     });
 }

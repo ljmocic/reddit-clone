@@ -26,7 +26,7 @@ import beans.Subforum;
 import beans.SubforumSearchRequest;
 import beans.Topic;
 import beans.User;
-import dao.ApplicationDAO;
+import database.ApplicationDAO;
 import utils.Config;
 
 @Path("/subforum")
@@ -150,6 +150,7 @@ public class SubforumService {
 			topic.click();
 			if(user != null) {
 				user.addClickedTopic(topic.getName());
+				dao.saveDatabase();
 			}
 			return topic;
 		}
@@ -225,6 +226,24 @@ public class SubforumService {
 			user.followForum(subforumId);
 			dao.saveDatabase();
 			return "Followed subforum " + subforumId;
+		}
+		else {
+			return "Must be logged in to follow a subforum!";
+		}
+	}
+	
+	@GET
+	@Path("/unfollow/{subforumId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String unfollow(@PathParam("subforumId") String subforumId){
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if(user != null) {
+			user.unfollowForum(subforumId);
+			dao.saveDatabase();
+			return "Unfollowed subforum " + subforumId;
 		}
 		else {
 			return "Must be logged in to follow a subforum!";
@@ -315,6 +334,8 @@ public class SubforumService {
 			moderator.addMessage(new Message("", moderator.getUsername(),
 			"Warning, the subforum " + report.getSubforumId() + " has been reported for violating rules."));
 			
+			dao.saveDatabase();
+			
 			return "Administrator has been notified.";
 		}
 		else {
@@ -338,6 +359,8 @@ public class SubforumService {
 												reportAuthor.getUsername(), 
 			"Your report on subforum " + report.getSubforumId() + " has been rejected!"));
 			
+			dao.saveDatabase();
+			
 			return "Report successfully rejected, report author is notified.";
 		}
 		else {
@@ -345,7 +368,6 @@ public class SubforumService {
 		}
 	}
 
-	
 	@POST
 	@Path("/advancedSearch")
 	@Consumes(MediaType.APPLICATION_JSON)

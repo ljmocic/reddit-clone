@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 
 import beans.Subforum;
 import beans.User;
-import dao.ApplicationDAO;
+import database.ApplicationDAO;
 import utils.Config;
 
 @Path("/user")
@@ -43,7 +43,6 @@ public class UserService {
 		}
 		else {
 			dao.addUser(userToRegister);
-			dao.saveDatabase();
 			return "Succesfully registered!";
 		}
 	}
@@ -66,7 +65,6 @@ public class UserService {
 			
 			if(user.getPassword().equals(userToLogIn.getPassword()) == true) {
 				session.setAttribute("user", user);
-				dao.saveDatabase();
 				return "Successfully logged in!";
 			}
 			else {
@@ -85,7 +83,8 @@ public class UserService {
 	@GET
 	@Path("/update/{role}/{username}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String update(@PathParam("role") String role, @PathParam("username") String username) {
+	public String update(	@PathParam("role") String role, 
+							@PathParam("username") String username) {
 		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
@@ -114,7 +113,6 @@ public class UserService {
 					
 					dao.changeUserRole(username, Config.USER);
 				}
-				dao.saveDatabase();
 				
 				return "Successfully updated!";
 			}

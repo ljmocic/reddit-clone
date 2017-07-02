@@ -19,7 +19,7 @@ import beans.Message;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
-import dao.ApplicationDAO;
+import database.ApplicationDAO;
 import utils.Config;
 
 @Path("/index")
@@ -117,7 +117,6 @@ public class IndexService {
 				subforum.getResponsibleModerator().contains(searchQuery)) {
 				
 				result.add(subforum);
-				
 			}
 		}
 		
@@ -139,10 +138,8 @@ public class IndexService {
 					topic.getParentSubforumName().contains(searchQuery)) {
 
 					result.add(topic);
-						
 				}
-			}
-			
+			}	
 		}
 		
 		return result;
@@ -153,6 +150,7 @@ public class IndexService {
 	@Path("/searchUsers/{searchQuery}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> searchUsers(@PathParam("searchQuery") String searchQuery) {
+		
 		List<User> result = new ArrayList<User>();
 		
 		for(User user: dao.getUsers()) {
@@ -173,6 +171,7 @@ public class IndexService {
 		User user = (User) session.getAttribute("user");
 		
 		List<Topic> topics = new ArrayList<Topic>();
+		List<Topic> best = new ArrayList<Topic>();
 		
 		for(Subforum subforum: dao.getSubforums()) {
 			for(Topic topic: subforum.getTopics()) {
@@ -180,11 +179,7 @@ public class IndexService {
 			}
 		}
 		
-		List<Topic> best = new ArrayList<Topic>();
-		
-		
-		
-		while(best.size() < 5 || topics.size() > 0) {
+		while(best.size() < 5 && topics.size() > 0) {
 			int max = -1;
 			int maxTopicInd = 0;
 			
@@ -196,7 +191,7 @@ public class IndexService {
 				}
 			}
 			
-			// TODO check this code for edge cases
+			boolean flag = false;
 			
 			if(user != null) {
 				for(int j = 0; j < user.getClickedTopics().size(); j++) {
@@ -205,14 +200,17 @@ public class IndexService {
 					if(topics.size() >= maxTopicInd) {
 						if(user.getClickedTopics().get(j).equals(topics.get(maxTopicInd).getName())) {
 							topics.remove(maxTopicInd);
+							flag = true;
 							break;
 						}
 					}
 				}
 			}
 			
-			best.add(topics.get(maxTopicInd));
-			topics.remove(maxTopicInd);
+			if(flag == false) {
+				best.add(topics.get(maxTopicInd));
+				topics.remove(maxTopicInd);
+			}
 		}
 		
 		return best;

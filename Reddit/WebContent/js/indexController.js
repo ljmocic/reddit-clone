@@ -8,6 +8,7 @@ $(document).ready(function () {
     $('#adminActions').hide();
 
     $('#imageUploadDiv').hide();
+    $('#imageUploadUpdateDiv').hide();
 
     $('#showProfileLink').click(function () {
         loadProfileDetails();
@@ -17,7 +18,7 @@ $(document).ready(function () {
 
     loadSubforumLinks();
 
-    //loadRecommendations();
+    loadRecommendations();
 
     var loginFormId = 'loginForm';
     $('#' + loginFormId).submit(function (e) {
@@ -96,16 +97,29 @@ $(document).ready(function () {
     });
 
     $('#AddTopicInputType').change(function (e) {
-        if($('#AddTopicInputType').val() == "image") {
+        if ($('#AddTopicInputType').val() == "image") {
             $('#imageUploadDiv').show();
         }
         else {
             $('#imageUploadDiv').hide();
         }
     });
-    
+
+    $('#EditTopicInputType').change(function (e) {
+        if ($('#EditTopicInputType').val() == "image") {
+            $('#imageUploadUpdateDiv').show();
+        }
+        else {
+            $('#imageUploadUpdateDiv').hide();
+        }
+    });
+
     $('#imageUpload').change(function (e) {
         uploadImage();
+    });
+
+    $('#imageUpdateUpload').change(function (e) {
+        uploadUpdateImage();
     });
 
     $('#logout').click(function () {
