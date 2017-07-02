@@ -3,52 +3,45 @@ function loadMessages() {
         url: baseUrl + "/index/messages"
     }).then(function (messages) {
 
-        var messageId = 0;
         var unseenMessages = 0;
-        messages.forEach(function (message) {
+        for (var i = 0; i < messages.length; i++) {
 
-            var messageRow = '<p>From: ' + message.senderId + " Message: " + message.content;
+            var messageRow = '<p>From: ' + messages[i].senderId + " Message: " + messages[i].content;
 
-            if (message.hasReport == true && message.seen == false) {
-                messageRow += '&nbsp;<button type="button" id="deleteReport' + messageId + '" class="btn btn-info btn-sm">Delete</button>';
-                messageRow += '&nbsp;<button type="button" id="warnReport' + messageId + '" class="btn btn-info btn-sm">Warn</button>';
-                messageRow += '&nbsp;<button type="button" id="rejectReport' + messageId + '" class="btn btn-info btn-sm">Reject</button>';
+            if (messages[i].hasReport == true && messages[i].seen == false) {
+                messageRow += '&nbsp;<button type="button" id="' + i + '" class="deleteReport">Delete</button>';
+                messageRow += '&nbsp;<button type="button" id="' + i + '" class="warnReport">Warn</button>';
+                messageRow += '&nbsp;<button type="button" id="' + i + '" class="rejectReport">Reject</button>';
             }
 
 
-            if (message.seen == false) {
-                messageRow += '&nbsp;<button type="button" id="seen' + messageId + '" class="btn btn-info btn-sm">Read</button>';
+            if (messages[i].seen == false) {
+                messageRow += '&nbsp;<button type="button" id="' + i + '" class="seen">Read</button>';
                 unseenMessages++;
             }
 
             $('#messages').append(messageRow + '</p>');
 
-            if (message.seen == false) {
-                var tempMessageId = messageId;
-                $("#seen" + tempMessageId).click(function () {
-                    setMessageSeen(tempMessageId);
-                });
-            }
+        }
 
-            if (message.hasReport == true) {
-                var tempMessageId = messageId;
-                $("#deleteReport" + tempMessageId).click(function () {
-                    deleteEntityNotification(message, tempMessageId);
-                });
+        $(".seen").click(function () {
+            var messageId = $(this).attr('id');
+            setMessageSeen(messageId);
+        });
 
-                $("#warnReport" + tempMessageId).click(function () {
-                    var tempMessageId = messageId;
-                    warnEntityNotification(message, tempMessageId);
-                });
+        $(".deleteReport").click(function () {
+            var messageId = $(this).attr('id');
+            deleteEntityNotification(messages[messageId], messageId);
+        });
 
-                $("#rejectReport" + tempMessageId).click(function () {
-                    var tempMessageId = messageId;
-                    rejectEntityNotification(message, tempMessageId);
-                });
-            }
+        $(".warnReport").click(function () {
+            var messageId = $(this).attr('id');
+            warnEntityNotification(messages[messageId], messageId);
+        });
 
-            messageId++;
-
+        $(".rejectReport").click(function () {
+            var messageId = $(this).attr('id');
+            rejectEntityNotification(messages[messageId], messageId);
         });
 
         $('#receivedMessagesBadge').text(unseenMessages);

@@ -71,9 +71,8 @@ public class CommentService {
 		String commentId = arr[2];
 		
 		if(user != null) {
-			Topic topic = dao.searchTopics(subforumId, topicId);
 			Comment comment = dao.searchComments(subforumId, topicId, commentId);
-			topic.getComments().remove(comment);
+			comment.setDeleted(true);
 			return "Comment deleted!";
 		}
 		else {

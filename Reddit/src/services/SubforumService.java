@@ -173,7 +173,15 @@ public class SubforumService {
 			if(subforum != null) {
 				subforum.setName(subforumToAdd.getName());
 				subforum.setDescription(subforumToAdd.getDescription());
-				subforum.setResponsibleModerator(subforumToAdd.getResponsibleModerator());
+				
+				User moderator = dao.searchUser(subforumToAdd.getResponsibleModerator());
+				
+				if(moderator != null) {
+					if(moderator.getRole().equals(Config.MODERATOR)) {
+						subforum.setResponsibleModerator(subforumToAdd.getResponsibleModerator());
+					}
+				}
+				
 				subforum.setRules(subforumToAdd.getRules());
 				dao.saveDatabase();
 				
@@ -295,11 +303,13 @@ public class SubforumService {
 		
 		if(user != null) {
 			
-			Report report = user.getMessages().get(messageId - 1).getReport();
+			user.getMessages().get(messageId).setSeen(true);
+			Report report = user.getMessages().get(messageId).getReport();
 			
 			User admin = dao.searchUser("admin");
+			User reporter = dao.searchUser(report.getUserId());
 			
-			user.addMessage(new Message(admin.getUsername(), user.getUsername(), 
+			reporter.addMessage(new Message("", reporter.getUsername(), 
 			"Thank you for report! Reported subforum will be deleted."));
 			
 			admin.addMessage(new Message(user.getUsername(), admin.getUsername(),
@@ -324,14 +334,17 @@ public class SubforumService {
 		
 		if(user != null) {
 			
-			Report report = user.getMessages().get(messageId - 1).getReport();
+			user.getMessages().get(messageId).setSeen(true);
+			Report report = user.getMessages().get(messageId).getReport();
 			
-			User moderator = dao.searchUser(dao.searchSubforums(report.getSubforumId()).getResponsibleModerator());
+			User admin = dao.searchUser("admin");
 			
-			user.addMessage(new Message("", user.getUsername(), 
+			User reporter = dao.searchUser(report.getUserId());
+			
+			reporter.addMessage(new Message("", reporter.getUsername(), 
 			"Thank you for report! Reported subforum author is notified about breaking rules."));
 			
-			moderator.addMessage(new Message("", moderator.getUsername(),
+			admin.addMessage(new Message("", admin.getUsername(),
 			"Warning, the subforum " + report.getSubforumId() + " has been reported for violating rules."));
 			
 			dao.saveDatabase();
@@ -353,7 +366,8 @@ public class SubforumService {
 		
 		if(user != null) {
 			
-			Report report = user.getMessages().get(messageId - 1).getReport();
+			user.getMessages().get(messageId).setSeen(true);
+			Report report = user.getMessages().get(messageId).getReport();
 			User reportAuthor = dao.searchUser(report.getUserId());
 			reportAuthor.addMessage(new Message(user.getUsername(), 
 												reportAuthor.getUsername(), 

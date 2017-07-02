@@ -1,13 +1,21 @@
 function loadSubforum(subforumId, followedForumsMode) {
 
     $.ajax({
-        url: baseUrl + '/subforum/' + subforumId + '/topics'
-    }).then(function (topics) {
+        url: baseUrl + '/subforum/' + subforumId
+    }).then(function (subforum) {
+
+        var topics = subforum.topics;
 
         $.ajax({
             url: baseUrl + "/user/active/"
         }).then(function (user) {
 
+            if(user.username == subforum.responsibleModerator) {
+                $('#deleteSubforumButton').show();
+            }
+            else {
+                $('#deleteSubforumButton').hide();
+            }
 
             if (followedForumsMode == true) {
 
@@ -31,7 +39,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     '<td class="likesCount">' + (parseInt(topic.likes) - parseInt(topic.dislikes)) + '</td>' +
                     '<td class="submittedBy">submitted by ' + topic.author + '</td>';
                 if (user != undefined) {
-                    if (topic.author == user.username || user.role == "moderator" || user.role == "admin") {
+                    if (topic.author == user.username || user.username == subforum.responsibleModerator || user.role == "admin") {
                         tableRow += '<td><a href="#" class="deleteTopic' + topics[0].parentSubforumName + '">Delete</a>&nbsp;<a href="#" class="editTopic' + topics[0].parentSubforumName + '">Edit</a></td>';
                     }
                     else {
@@ -82,47 +90,50 @@ function loadSubforum(subforumId, followedForumsMode) {
 
                     var temp = "<h5>Comments</h5><hr><table><tbody>";
                     if (topic.comments.length > 0) {
-                        
+
                         topic.comments.forEach(function (comment) {
 
+                            if (comment.deleted == false) {
 
-                            var commentRow = '<tr>' +
-                                '<td>' +
-                                '<table id="' + topics[0].parentSubforumName + "_" + topic.name + "_" + comment.id + '">' +
-                                '<tbody>' +
-                                '<tr>' +
-                                '<td class="likeTopicRow"><a href="#" class="likeComment">Like</a></td>' +
-                                '<td class="likeTopicRow">' + comment.text + '  </td>' +
-                                '<td class="likeTopicRow"><!--<a href="#" class="saveComment">Save</a>--></td>' +
-                                '</tr>' +
-                                '<tr>' +
-                                '<td class="likeTopicRow">' + (parseInt(comment.likes) - parseInt(comment.dislikes)) + '</td>' +
-                                '<td class="likeTopicRow">submitted by ' + comment.author + '</td>';
-                            if (user != undefined) {
-                                if (comment.author == user.username || user.role == "moderator" || user.role == "admin") {
-                                    commentRow += '<td><a href="#" class="deleteComment">Delete</a></td>';
+                                var commentRow = '<tr>' +
+                                    '<td>' +
+                                    '<table id="' + topics[0].parentSubforumName + "_" + topic.name + "_" + comment.id + '">' +
+                                    '<tbody>' +
+                                    '<tr>' +
+                                    '<td class="likeTopicRow"><a href="#" class="likeComment">Like</a></td>' +
+                                    '<td class="likeTopicRow">' + comment.text + '  </td>' +
+                                    '<td class="likeTopicRow"><!--<a href="#" class="saveComment">Save</a>--></td>' +
+                                    '</tr>' +
+                                    '<tr>' +
+                                    '<td class="likeTopicRow">' + (parseInt(comment.likes) - parseInt(comment.dislikes)) + '</td>' +
+                                    '<td class="likeTopicRow">submitted by ' + comment.author + '</td>';
+                                if (user != undefined) {
+                                    if (comment.author == user.username || user.role == "moderator" || user.role == "admin") {
+                                        commentRow += '<td><a href="#" class="deleteComment">Delete</a></td>';
+                                    }
+                                    else {
+                                        commentRow += '<td></td>';
+                                    }
                                 }
                                 else {
                                     commentRow += '<td></td>';
                                 }
+
+                                commentRow += '</tr>' +
+                                    '<tr>' +
+                                    '<td class="likeTopicRow"><a href="#" class="dislikeComment">Dislike</a></td>' +
+                                    '<td class="likeTopicRow"></td>' +
+                                    '<td clsss="likeTopicRow"></td>' +
+                                    '</tr>' +
+                                    '</tbody>' +
+                                    '</table>' +
+                                    '</td>'
+                                '</tr>';
+
+
+                                temp += commentRow;
+
                             }
-                            else {
-                                commentRow += '<td></td>';
-                            }
-
-                            commentRow += '</tr>' +
-                                '<tr>' +
-                                '<td class="likeTopicRow"><a href="#" class="dislikeComment">Dislike</a></td>' +
-                                '<td class="likeTopicRow"></td>' +
-                                '<td clsss="likeTopicRow"></td>' +
-                                '</tr>' +
-                                '</tbody>' +
-                                '</table>' +
-                                '</td>'
-                            '</tr>';
-
-
-                            temp += commentRow;
                         });
 
                     }
@@ -130,7 +141,7 @@ function loadSubforum(subforumId, followedForumsMode) {
                     $('#topicContentModal').append(temp);
                     $('#topicContentModal').append('<textarea name="content" data-minlength="3" id="newCommentText" class="form-control" placeholder="Enter comment" rows="2"></textarea>');
                     $('#topicContentModal').append('<button id="addCommentButton" class="btn btn-primary text-right">Add comment</button>');
-                    
+
 
                     $('#addCommentButton').click(function () {
                         // send request to add comment
@@ -297,7 +308,8 @@ function loadSubforum(subforumId, followedForumsMode) {
                                 complete: function (data) {
                                     alert(data.responseText);
                                     $('.modal').modal('hide');
-                                    loadSubforum(topic.parentSubforumName);
+                                    //loadSubforum(topic.parentSubforumName);
+                                    refresh();
                                 }
                             });
                         });
@@ -366,13 +378,17 @@ function loadSubforumLinks() {
         // add subforum links to modal and sidebar
         subforums.forEach(function (subforum) {
 
+            if(subforum.icon == "") {
+                subforum.icon = "test.png";
+            }
+
             var imageTag = '<img src="' + subforum.icon + '" alt="" />';
 
             $('#subforumsLinks').append(
-                '<p>' + imageTag + '<a class="subforumLink" id="' + subforum.name + '" href="#">' + subforum.name + " - " + subforum.description + '</a></p>'
+                '<p>' + imageTag + '&nbsp;<a class="subforumLink" id="' + subforum.name + '" href="#">' + subforum.name + " - " + subforum.description + '</a></p>'
             );
 
-            $('#subforumsSidebarList').append(imageTag + '<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a><br>');
+            $('#subforumsSidebarList').append(imageTag + '&nbsp;<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a><br>');
         });
 
         // add click callbacks on all subforum links

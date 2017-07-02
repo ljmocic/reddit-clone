@@ -358,6 +358,7 @@ public class TopicService {
 		
 		if(user != null) {
 			
+			user.getMessages().get(messageId).setSeen(true);
 			Message message = user.getMessages().get(messageId);
 			
 			Report report = message.getReport();
@@ -396,26 +397,32 @@ public class TopicService {
 		
 		if(user != null) {
 			
-			Report report = user.getMessages().get(messageId - 1).getReport();
+			user.getMessages().get(messageId).setSeen(true);
+			Report report = user.getMessages().get(messageId).getReport();
 			
 			User reportAuthor = dao.searchUser(report.getUserId());
 			
 			Topic topic = dao.searchTopics(report.getSubforumId(), report.getTopicId());
 			
-			String entityAuthorId = topic.getAuthor();
-			User entityAuthor = dao.searchUser(entityAuthorId);
-			
-			reportAuthor.addMessage(new Message(user.getUsername(), 
-												reportAuthor.getUsername(), 
-												"Thank you for report! Reported topic author is notified about breaking rules."));
-			
-			entityAuthor.addMessage(new Message(user.getUsername(), 
-					entityAuthor.getUsername(), 
-					"Warning, the topic " + topic.getName() + " has been reported for violating rules."));
-			
-			dao.saveDatabase();
-			
-			return "Report author and topic author has been notified.";
+			if(topic != null) {
+				String entityAuthorId = topic.getAuthor();
+				User entityAuthor = dao.searchUser(entityAuthorId);
+				
+				reportAuthor.addMessage(new Message(user.getUsername(), 
+													reportAuthor.getUsername(), 
+													"Thank you for report! Reported topic author is notified about breaking rules."));
+				
+				entityAuthor.addMessage(new Message(user.getUsername(), 
+						entityAuthor.getUsername(), 
+						"Warning, the topic " + topic.getName() + " has been reported for violating rules."));
+				
+				dao.saveDatabase();
+				
+				return "Report author and topic author has been notified.";
+			}
+			else {
+				return "Report has been already resolved.";
+			}
 		}
 		else {
 			return "Must be logged in!";
@@ -432,18 +439,23 @@ public class TopicService {
 		
 		if(user != null) {
 			
-			Report report = user.getMessages().get(messageId - 1).getReport();
+			user.getMessages().get(messageId).setSeen(true);
+			Report report = user.getMessages().get(messageId).getReport();
 			
 			Topic topic = dao.searchTopics(report.getSubforumId(), report.getTopicId());
 			
-			User reportAuthor = dao.searchUser(report.getUserId());
-			reportAuthor.addMessage(new Message(user.getUsername(), 
-												reportAuthor.getUsername(), 
-												"Your report on " + topic.getName() + " has been rejected!"));
-			
-			dao.saveDatabase();
-			
-			return "Report successfully rejected, report author is notified.";
+			if(topic != null) {
+				User reportAuthor = dao.searchUser(report.getUserId());
+				reportAuthor.addMessage(new Message(user.getUsername(), 
+													reportAuthor.getUsername(), 
+													"Your report on " + topic.getName() + " has been rejected!"));
+				
+				dao.saveDatabase();
+				return "Report successfully rejected, report author is notified.";
+			}
+			else {
+				return "Report has been already resolved.";
+			}
 		}
 		else {
 			return "Must be logged in!";

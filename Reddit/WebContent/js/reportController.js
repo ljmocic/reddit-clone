@@ -11,6 +11,8 @@ function deleteEntityNotification(message, messageId) {
         url: baseUrl + path + messageId
     }).then(function (message) {
         alert(message);
+        $('#messages').empty();
+        loadMessages();
     });
 }
 
@@ -27,6 +29,8 @@ function warnEntityNotification(message, messageId) {
         url: baseUrl + path + messageId
     }).then(function (message) {
         alert(message);
+        $('#messages').empty();
+        loadMessages();
     });
 }
 
@@ -39,10 +43,11 @@ function rejectEntityNotification(message, messageId) {
         path = "/topic/report/reject/";
     }
 
-
     $.ajax({
         url: baseUrl + path + messageId
     }).then(function (message) {
         alert(message);
+        $('#messages').empty();
+        loadMessages();
     });
 }
