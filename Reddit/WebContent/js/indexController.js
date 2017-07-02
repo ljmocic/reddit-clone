@@ -15,7 +15,7 @@ $(document).ready(function () {
 
     loadSubforumLinks();
 
-    loadRecommendations();
+    //loadRecommendations();
 
     var loginFormId = 'loginForm';
     $('#' + loginFormId).submit(function (e) {
@@ -35,7 +35,7 @@ $(document).ready(function () {
     // subforum forms handlers
     var addSubforumFormId = 'addSubforumForm';
     $('#' + addSubforumFormId).submit(function (e) {
-        handleForm(e, addSubforumFormId);
+        addSubforumForm(e, addSubforumFormId);
     });
 
     var editSubforumFormId = 'editSubforumForm';
@@ -93,19 +93,17 @@ $(document).ready(function () {
         deleteSubforum();
     });
 
+    /*
     $('input:file').change(function (e) {
         uploadFile();
     });
+    */
 
     $('#logout').click(function () {
         logoutUser();
     });
 
 });
-
-function uploadFile() {
-    alert("To do upload!");
-}
 
 function loadRecommendations() {
     $.ajax({
@@ -201,6 +199,60 @@ function logoutUser() {
     }).then(function (message) {
         alert(message);
         refresh();
+    });
+}
+
+function addSubforumForm(e, formId, responseAction) {
+
+    e.preventDefault();
+
+    var file = $('#iconUpload')[0].files[0];
+
+    $.ajax({
+        url : baseUrl + "/subforum/icon",
+        type : "POST",
+        contentType : "multipart/form-data",
+        dataType: "json",
+        data: file,
+        processData: false,
+        async: false,
+        complete: function(response) {
+            alert("File uploaded!");
+            alert(response.responseText);
+
+            var form = $('#' + formId);
+
+            var input = $('#' + formId + ' :input');
+
+            var data = {};
+            for (var i = 0; i < input.length; i++) {
+                if (input[i].name) {
+                    if(input[i].type != "file") {
+                        data[input[i].name] = input[i].value;
+                    }
+                }
+            }
+
+            data["icon"] = response.responseText;
+
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                complete: function (data) {
+                    if (responseAction == undefined) {
+                        alert(data.responseText);
+                        $('.modal').modal('hide');
+                        refresh();
+                    }
+                    else {
+                        responseAction(data);
+                    }
+                }
+            });
+            
+        }
     });
 }
 
@@ -401,12 +453,17 @@ function loadSubforumLinks() {
         url: baseUrl + "/index/subforums"
     }).then(function (subforums) {
 
+        
+
         subforums.forEach(function (subforum) {
+
+            var imageTag = '<img src="' + subforum.icon + '" alt="" />';
+            
             $('#subforumsLinks').append(
-                '<p><a class="subforumLink" id="' + subforum.name + '" href="#">' + subforum.name + " " + subforum.description + '</a></p>'
+                '<p>' + imageTag + '<a class="subforumLink" id="' + subforum.name + '" href="#">' + subforum.name + " - " + subforum.description + '</a></p>'
             );
 
-            $('#subforumsSidebarList').append('<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a>&nbsp;');
+            $('#subforumsSidebarList').append(imageTag + '<a href="#" class="subforumLink" id="' + subforum.name + '">' + subforum.name + '</a><br>');
         });
 
         $(".subforumLink").click(function () {

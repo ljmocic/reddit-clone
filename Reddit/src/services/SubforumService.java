@@ -1,7 +1,12 @@
 package services;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +53,12 @@ public class SubforumService {
 			if(user.getRole().equals(Config.MODERATOR) || user.getRole().equals(Config.ADMIN)) {
 				if(dao.searchSubforums(subforumToAdd.getName()) == null) {
 					if(!(subforumToAdd.getName().equals("") || subforumToAdd.getDescription().equals("") || subforumToAdd.getRules().equals(""))) {
-						Subforum subforum = new Subforum(subforumToAdd.getName(), subforumToAdd.getDescription(), subforumToAdd.getRules(), null, user.getUsername());
+						Subforum subforum = new Subforum(subforumToAdd.getName(), 
+								subforumToAdd.getDescription(), 
+								subforumToAdd.getRules(), 
+								subforumToAdd.getIcon(), 
+								user.getUsername());
+						
 						dao.addSubforum(subforum);
 						return "Added a forum " + subforumToAdd.getName();
 					}
@@ -69,6 +79,31 @@ public class SubforumService {
 			return "Must be logged in to add subforum!";
 		}
 	}
+	
+	@POST
+    @Path("/icon")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public String uploadIcon(InputStream uploadedInputStream) {
+        String fileLocation = context.getRealPath("") + "\\";
+        String imageId = UUID.randomUUID().toString()  + ".png";
+        
+        fileLocation += imageId;
+        try {
+        	File file = new File(fileLocation);
+        	file.createNewFile();
+            FileOutputStream out = new FileOutputStream(file, false);
+            int read = 0;
+            byte[] bytes = new byte[1024];
+            while ((read = uploadedInputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imageId;
+    }
 	
 	@GET
 	@Path("/{subforumId}/topics")

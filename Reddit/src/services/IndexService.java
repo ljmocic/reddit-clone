@@ -170,7 +170,6 @@ public class IndexService {
 	public List<Topic> recommendations() {
 		
 		HttpSession session = request.getSession();
-		@SuppressWarnings("unused")
 		User user = (User) session.getAttribute("user");
 		
 		List<Topic> topics = new ArrayList<Topic>();
@@ -185,7 +184,7 @@ public class IndexService {
 		
 		
 		
-		while(best.size() < 5 || topics.size() < 5) {
+		while(best.size() < 5 || topics.size() > 0) {
 			int max = -1;
 			int maxTopicInd = 0;
 			
@@ -198,7 +197,7 @@ public class IndexService {
 			}
 			
 			// TODO check this code for edge cases
-			/*
+			
 			if(user != null) {
 				for(int j = 0; j < user.getClickedTopics().size(); j++) {
 					
@@ -211,7 +210,7 @@ public class IndexService {
 					}
 				}
 			}
-			*/
+			
 			best.add(topics.get(maxTopicInd));
 			topics.remove(maxTopicInd);
 		}

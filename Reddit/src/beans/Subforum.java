@@ -25,7 +25,7 @@ public class Subforum implements Serializable {
 		super();
 		this.name = name;
 		this.description = description;
-		this.rules = rules;
+		this.rules = rules;		
 		this.icon = icon;
 		this.responsibleModeratorId = responsibleModeratorId;
 		this.topics = new ArrayList<Topic>();
