@@ -10,11 +10,13 @@ function loadSubforum(subforumId, followedForumsMode) {
             url: baseUrl + "/user/active/"
         }).then(function (user) {
 
-            if(user.username == subforum.responsibleModerator) {
-                $('#deleteSubforumButton').show();
-            }
-            else {
-                $('#deleteSubforumButton').hide();
+            if(user != undefined) {
+                if(user.username == subforum.responsibleModerator) {
+                    $('#deleteSubforumButton').show();
+                }
+                else {
+                    $('#deleteSubforumButton').hide();
+                }
             }
 
             if (followedForumsMode == true) {
